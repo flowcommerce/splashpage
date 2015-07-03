@@ -1,2 +1,8 @@
-# splashpage
-The open-source LaunchRock alternative. Build beautiful splash pages to collect emails &amp; more – primarily focused on performance and rapid development. 
+# Create Bootstrap Landing Page + Mail Chimp + Viral marketing strategies
+
+In a lean startup way, we need to create a Landing Page to capture email signups and drive traffic to your site while focusing on building your startup app. "Launching" a startup this way,we can partly validate our idea and value proposition. With splashpage, you will learn:
+
+* Build a typical Startup Landing Page to capture emails signups
+* Make the page responsive for mobile, tablet & desktop
+* Embed MailChimp code for email marketing strategy
+* Apply basic SEO techniques
