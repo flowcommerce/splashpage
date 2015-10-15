@@ -36,6 +36,10 @@ package io.flow.common.v0.models {
     message: String
   )
 
+  case class Healthcheck(
+    status: String
+  )
+
   case class Price(
     amount: BigDecimal,
     currency: String
@@ -399,6 +403,16 @@ package io.flow.common.v0.models {
         (__ \ "code").write[String] and
         (__ \ "message").write[String]
       )(unlift(Error.unapply _))
+    }
+
+    implicit def jsonReadsCommonHealthcheck: play.api.libs.json.Reads[Healthcheck] = {
+      (__ \ "status").read[String].map { x => new Healthcheck(status = x) }
+    }
+
+    implicit def jsonWritesCommonHealthcheck: play.api.libs.json.Writes[Healthcheck] = new play.api.libs.json.Writes[Healthcheck] {
+      def writes(x: Healthcheck) = play.api.libs.json.Json.obj(
+        "status" -> play.api.libs.json.Json.toJson(x.status)
+      )
     }
 
     implicit def jsonReadsCommonPrice: play.api.libs.json.Reads[Price] = {
