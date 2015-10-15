@@ -2,7 +2,7 @@ package controllers
 
 // import db.{Authorization, SubscriptionsDao}
 import lib.Validation
-import io.flow.splashpage.v0.models.{Publication, Subscription, SubscriptionForm, User}
+import io.flow.splashpage.v0.models.{Publication, Subscription, SubscriptionForm}
 import io.flow.splashpage.v0.models.json._
 import io.flow.common.v0.models.json._
 import play.api.mvc._
@@ -13,7 +13,7 @@ object Subscriptions extends Controller {
 
   def get(
     guid: Option[UUID],
-    userGuid: Option[java.util.UUID],
+    email: Option[String],
     publication: Option[Publication],
     limit: Long = 25,
     offset: Long = 0
@@ -28,6 +28,7 @@ object Subscriptions extends Controller {
       }
       case s: JsSuccess[SubscriptionForm] => {
         val form = s.get
+        println(s"Email[${form.email}] subscribing to publication[${form.publication}]")
         sys.error("TODO")
         /*
         SubscriptionsDao.validate(request.user, form) match {

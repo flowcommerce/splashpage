@@ -16,18 +16,11 @@
 
     "models": {
 
-	"user": {
-	    "fields": [
-		{ "name": "guid", "type": "uuid", "description": "Internal unique identifier for this user" },
-		{ "name": "email", "type": "string" }
-	    ]
-	},
-
 	"subscription": {
-	    "description": "Represents a user that is currently subscribed to a publication",
+	    "description": "Represents an email address that is currently subscribed to a publication",
 	    "fields": [
 		{ "name": "guid", "type": "uuid", "description": "Internal unique identifier for this subscription" },
-		{ "name": "user", "type": "user" },
+		{ "name": "email", "type": "string", "description": "Case insensitive email address to which to send notifications for this subscription" },
 		{ "name": "publication", "type": "publication" },
                 { "name": "audit", "type": "io.flow.common.v0.models.audit" }
 	    ]
@@ -35,7 +28,7 @@
 
 	"subscription_form": {
 	    "fields": [
-		{ "name": "user_guid", "type": "uuid" },
+		{ "name": "email", "type": "string" },
 		{ "name": "publication", "type": "publication" }
 	    ]
 	}
@@ -63,7 +56,7 @@
                     "description": "Search subscriptions. Always paginated.",
                     "parameters": [
                         { "name": "guid", "type": "uuid", "description": "Find the subscription with this guid.", "required": false },
-                        { "name": "user_guid", "type": "uuid", "description": "Find subscriptions for this user.", "required": false },
+                        { "name": "email", "type": "string", "description": "Find subscriptions for this email. Case insensitive.", "required": false },
                         { "name": "publication", "type": "publication", "description": "Find subscriptions for this publication.", "required": false },
                         { "name": "limit", "type": "long", "default": 25, "description": "The number of records to return", "minimum": 0, "maximum": 100 },
                         { "name": "offset", "type": "long", "default": 0, "description": "Used to paginate. First page of results is 0.", "minimum": 0 }

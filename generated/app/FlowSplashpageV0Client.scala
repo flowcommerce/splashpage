@@ -6,23 +6,18 @@
 package io.flow.splashpage.v0.models {
 
   /**
-   * Represents a user that is currently subscribed to a publication
+   * Represents an email address that is currently subscribed to a publication
    */
   case class Subscription(
     guid: _root_.java.util.UUID,
-    user: io.flow.splashpage.v0.models.User,
+    email: String,
     publication: io.flow.splashpage.v0.models.Publication,
     audit: io.flow.common.v0.models.Audit
   )
 
   case class SubscriptionForm(
-    userGuid: _root_.java.util.UUID,
+    email: String,
     publication: io.flow.splashpage.v0.models.Publication
-  )
-
-  case class User(
-    guid: _root_.java.util.UUID,
-    email: String
   )
 
   /**
@@ -104,7 +99,7 @@ package io.flow.splashpage.v0.models {
     implicit def jsonReadsSplashpageSubscription: play.api.libs.json.Reads[Subscription] = {
       (
         (__ \ "guid").read[_root_.java.util.UUID] and
-        (__ \ "user").read[io.flow.splashpage.v0.models.User] and
+        (__ \ "email").read[String] and
         (__ \ "publication").read[io.flow.splashpage.v0.models.Publication] and
         (__ \ "audit").read[io.flow.common.v0.models.Audit]
       )(Subscription.apply _)
@@ -113,7 +108,7 @@ package io.flow.splashpage.v0.models {
     implicit def jsonWritesSplashpageSubscription: play.api.libs.json.Writes[Subscription] = {
       (
         (__ \ "guid").write[_root_.java.util.UUID] and
-        (__ \ "user").write[io.flow.splashpage.v0.models.User] and
+        (__ \ "email").write[String] and
         (__ \ "publication").write[io.flow.splashpage.v0.models.Publication] and
         (__ \ "audit").write[io.flow.common.v0.models.Audit]
       )(unlift(Subscription.unapply _))
@@ -121,30 +116,16 @@ package io.flow.splashpage.v0.models {
 
     implicit def jsonReadsSplashpageSubscriptionForm: play.api.libs.json.Reads[SubscriptionForm] = {
       (
-        (__ \ "user_guid").read[_root_.java.util.UUID] and
+        (__ \ "email").read[String] and
         (__ \ "publication").read[io.flow.splashpage.v0.models.Publication]
       )(SubscriptionForm.apply _)
     }
 
     implicit def jsonWritesSplashpageSubscriptionForm: play.api.libs.json.Writes[SubscriptionForm] = {
       (
-        (__ \ "user_guid").write[_root_.java.util.UUID] and
+        (__ \ "email").write[String] and
         (__ \ "publication").write[io.flow.splashpage.v0.models.Publication]
       )(unlift(SubscriptionForm.unapply _))
-    }
-
-    implicit def jsonReadsSplashpageUser: play.api.libs.json.Reads[User] = {
-      (
-        (__ \ "guid").read[_root_.java.util.UUID] and
-        (__ \ "email").read[String]
-      )(User.apply _)
-    }
-
-    implicit def jsonWritesSplashpageUser: play.api.libs.json.Writes[User] = {
-      (
-        (__ \ "guid").write[_root_.java.util.UUID] and
-        (__ \ "email").write[String]
-      )(unlift(User.unapply _))
     }
   }
 }
@@ -230,14 +211,14 @@ package io.flow.splashpage.v0 {
     object Subscriptions extends Subscriptions {
       override def get(
         guid: _root_.scala.Option[_root_.java.util.UUID] = None,
-        userGuid: _root_.scala.Option[_root_.java.util.UUID] = None,
+        email: _root_.scala.Option[String] = None,
         publication: _root_.scala.Option[io.flow.splashpage.v0.models.Publication] = None,
         limit: Long = 25,
         offset: Long = 0
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.flow.splashpage.v0.models.Subscription]] = {
         val queryParameters = Seq(
           guid.map("guid" -> _.toString),
-          userGuid.map("user_guid" -> _.toString),
+          email.map("email" -> _),
           publication.map("publication" -> _.toString),
           Some("limit" -> limit.toString),
           Some("offset" -> offset.toString)
@@ -378,7 +359,7 @@ package io.flow.splashpage.v0 {
      */
     def get(
       guid: _root_.scala.Option[_root_.java.util.UUID] = None,
-      userGuid: _root_.scala.Option[_root_.java.util.UUID] = None,
+      email: _root_.scala.Option[String] = None,
       publication: _root_.scala.Option[io.flow.splashpage.v0.models.Publication] = None,
       limit: Long = 25,
       offset: Long = 0

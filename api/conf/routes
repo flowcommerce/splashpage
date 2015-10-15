@@ -3,7 +3,7 @@
 # apidoc:0.9.42 http://www.apidoc.me/flow/splashpage/0.0.1-dev/play_2_x_routes
 
 GET        /_internal_/healthcheck     controllers.IoFlowCommonV0ModelsHealthchecks.getInternalAndHealthcheck()
-GET        /subscriptions              controllers.Subscriptions.get(guid: _root_.scala.Option[_root_.java.util.UUID], user_guid: _root_.scala.Option[_root_.java.util.UUID], publication: _root_.scala.Option[io.flow.splashpage.v0.models.Publication], limit: Long ?= 25, offset: Long ?= 0)
+GET        /subscriptions              controllers.Subscriptions.get(guid: _root_.scala.Option[_root_.java.util.UUID], email: _root_.scala.Option[String], publication: _root_.scala.Option[io.flow.splashpage.v0.models.Publication], limit: Long ?= 25, offset: Long ?= 0)
 GET        /subscriptions/:guid        controllers.Subscriptions.getByGuid(guid: _root_.java.util.UUID)
 POST       /subscriptions              controllers.Subscriptions.post()
 DELETE     /subscriptions/:guid        controllers.Subscriptions.deleteByGuid(guid: _root_.java.util.UUID)
