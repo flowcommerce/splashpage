@@ -722,6 +722,7 @@ footer {
 }
 
 footer span.copyright {
+    font-size: 10px;
     text-transform: uppercase;
     text-transform: none;
     font-family: Montserrat,"Helvetica Neue",Helvetica,Arial,sans-serif;
