@@ -29,7 +29,23 @@ object Subscriptions extends Controller {
       case s: JsSuccess[SubscriptionForm] => {
         val form = s.get
         println(s"Email[${form.email}] subscribing to publication[${form.publication}]")
-        sys.error("TODO")
+        val now = new org.joda.time.DateTime()
+        val guid = UUID.randomUUID()
+        Ok(
+          Json.toJson(
+            Subscription(
+              guid = guid,
+              email = form.email,
+              publication = form.publication,
+              audit = io.flow.common.v0.models.Audit(
+                createdAt = now,
+                createdBy = io.flow.common.v0.models.Reference(guid),
+                updatedAt = now,
+                updatedBy = io.flow.common.v0.models.Reference(guid)
+              )
+            )
+          )
+        )
         /*
         SubscriptionsDao.validate(request.user, form) match {
           case Nil => {
