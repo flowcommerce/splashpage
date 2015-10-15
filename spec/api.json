@@ -63,7 +63,6 @@
                     "description": "Search subscriptions. Always paginated.",
                     "parameters": [
                         { "name": "guid", "type": "uuid", "description": "Find the subscription with this guid.", "required": false },
-                        { "name": "organization_key", "type": "string", "description": "Find subscriptions for this organization.", "required": false },
                         { "name": "user_guid", "type": "uuid", "description": "Find subscriptions for this user.", "required": false },
                         { "name": "publication", "type": "publication", "description": "Find subscriptions for this publication.", "required": false },
                         { "name": "limit", "type": "long", "default": 25, "description": "The number of records to return", "minimum": 0, "maximum": 100 },

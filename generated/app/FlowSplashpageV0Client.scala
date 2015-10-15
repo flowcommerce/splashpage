@@ -214,12 +214,22 @@ package io.flow.splashpage.v0 {
 
     logger.info(s"Initializing io.flow.splashpage.v0.Client for url $apiUrl")
 
+    def ioFlowCommonV0ModelsHealthchecks: IoFlowCommonV0ModelsHealthchecks = IoFlowCommonV0ModelsHealthchecks
+
     def subscriptions: Subscriptions = Subscriptions
+
+    object IoFlowCommonV0ModelsHealthchecks extends IoFlowCommonV0ModelsHealthchecks {
+      override def getInternalAndHealthcheck()(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.flow.common.v0.models.Healthcheck] = {
+        _executeRequest("GET", s"/_internal_/healthcheck").map {
+          case r if r.status == 200 => _root_.io.flow.splashpage.v0.Client.parseJson("io.flow.common.v0.models.Healthcheck", r, _.validate[io.flow.common.v0.models.Healthcheck])
+          case r => throw new io.flow.splashpage.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200")
+        }
+      }
+    }
 
     object Subscriptions extends Subscriptions {
       override def get(
         guid: _root_.scala.Option[_root_.java.util.UUID] = None,
-        organizationKey: _root_.scala.Option[String] = None,
         userGuid: _root_.scala.Option[_root_.java.util.UUID] = None,
         publication: _root_.scala.Option[io.flow.splashpage.v0.models.Publication] = None,
         limit: Long = 25,
@@ -227,7 +237,6 @@ package io.flow.splashpage.v0 {
       )(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[Seq[io.flow.splashpage.v0.models.Subscription]] = {
         val queryParameters = Seq(
           guid.map("guid" -> _.toString),
-          organizationKey.map("organization_key" -> _),
           userGuid.map("user_guid" -> _.toString),
           publication.map("publication" -> _.toString),
           Some("limit" -> limit.toString),
@@ -359,13 +368,16 @@ package io.flow.splashpage.v0 {
     case class Basic(username: String, password: Option[String] = None) extends Authorization
   }
 
+  trait IoFlowCommonV0ModelsHealthchecks {
+    def getInternalAndHealthcheck()(implicit ec: scala.concurrent.ExecutionContext): scala.concurrent.Future[io.flow.common.v0.models.Healthcheck]
+  }
+
   trait Subscriptions {
     /**
      * Search subscriptions. Always paginated.
      */
     def get(
       guid: _root_.scala.Option[_root_.java.util.UUID] = None,
-      organizationKey: _root_.scala.Option[String] = None,
       userGuid: _root_.scala.Option[_root_.java.util.UUID] = None,
       publication: _root_.scala.Option[io.flow.splashpage.v0.models.Publication] = None,
       limit: Long = 25,
