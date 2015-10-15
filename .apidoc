@@ -1,0 +1,16 @@
+upload:
+  flow:
+    splashpage:
+      path: spec/api.json
+
+code:
+  flow:
+    common:
+      version: latest
+      generators:
+        play_2_x_json: generated/app
+    splashpage:
+      version: latest
+      generators:
+        play_2_4_client: generated/app
+        play_2_x_routes: api/conf/routes
