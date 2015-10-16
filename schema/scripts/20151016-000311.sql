@@ -2,7 +2,7 @@ drop table if exists subscriptions;
 
 create table subscriptions (
   guid                    uuid primary key,
-  publication             text not null,
+  publication             text not null check (enum(publication)),
   email                   text not null check (trim(email) = email) check (email != '')
 );
 
