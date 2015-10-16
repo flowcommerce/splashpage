@@ -52,7 +52,8 @@ lazy val www = project
 lazy val commonSettings: Seq[Setting[_]] = Seq(
   name <<= name("splashpage-" + _),
   libraryDependencies ++= Seq(
-    "org.scalatest" %% "scalatest" % "2.2.0" % "test"
+    specs2 % Test,
+    "org.scalatest" %% "scalatest" % "2.2.0" % Test
   ),
   scalacOptions += "-feature",
   coverageHighlighting := true
