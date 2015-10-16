@@ -44,7 +44,7 @@ object SubscriptionsDao {
         limit = 1
       ).headOption match {
         case None => Seq.empty
-        case Some(_) => Seq("Email is already subscribed to this publication")
+        case Some(_) => Seq("Email is already subscribed")
       }
     }
 

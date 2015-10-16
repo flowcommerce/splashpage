@@ -62,7 +62,8 @@
                         { "name": "offset", "type": "long", "default": 0, "description": "Used to paginate. First page of results is 0.", "minimum": 0 }
                     ],
                     "responses": {
-                        "200": { "type": "[subscription]" }
+                        "200": { "type": "[subscription]" },
+			"401": { "type": "unit" }
                     }
                 },
 
@@ -72,6 +73,7 @@
                     "path": "/:guid",
                     "responses": {
                         "200": { "type": "subscription" },
+                        "401": { "type": "unit" },
                         "404": { "type": "unit" }
                     }
                 },
@@ -88,7 +90,11 @@
 
                 {
                     "method": "DELETE",
-		    "path": "/:guid"
+		    "path": "/:guid",
+		    "responses": {
+			"204": { "type": "unit" },
+			"401": { "type": "unit" }
+		    }
                 }
             ]
         }

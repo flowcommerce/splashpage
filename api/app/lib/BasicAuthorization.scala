@@ -15,9 +15,9 @@ object BasicAuthorization {
    * Parses the actual authorization header value
    */
   def get(value: String): Option[Authorization] = {
-    value.split(" ").toSeq match {
+    value.split(" ").toList match {
       case "Basic" :: value :: Nil => {
-        new String(Base64.decodeBase64(value.getBytes)).split(":").toSeq match {
+        new String(Base64.decodeBase64(value.getBytes)).split(":").toList match {
           case Nil => None
           case token :: rest => Some(Token(token))
         }

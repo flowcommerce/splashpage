@@ -32,7 +32,9 @@ private[controllers] object RequestHelper {
         case Some(auth: BasicAuthorization.Token) => {
           UsersDao.findByToken(auth.token)
         }
-        case _ => None
+        case _ => {
+          None
+        }
       }
     }
     UserAuth(user)

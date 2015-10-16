@@ -48,8 +48,6 @@ object Subscriptions extends Controller {
       }
       case s: JsSuccess[SubscriptionForm] => {
         val form = s.get
-        println(s"Email[${form.email}] subscribing to publication[${form.publication}]")
-
         SubscriptionsDao.validate(form) match {
           case Nil => {
             val subscription = SubscriptionsDao.create(request.user, form)
