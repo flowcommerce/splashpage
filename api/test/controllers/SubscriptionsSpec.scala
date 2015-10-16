@@ -82,6 +82,10 @@ class SubscriptionsSpec extends PlaySpecification {
     ) must beEqualTo(sub)
   }
 
+  "GET /subscriptions/:guid w/ invalid guid returns 404" in new WithServer(port=port) {
+    // TODO
+  }
+
   "GET /subscriptions by guid" in new WithServer(port=port) {
     val sub = createSubscription()
     await(

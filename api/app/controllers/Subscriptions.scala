@@ -34,11 +34,10 @@ object Subscriptions extends Controller {
 
   def getByGuid(guid: UUID) = Authenticated { request =>
     request.requireSystem()
-    Ok(
-      Json.toJson(
-        SubscriptionsDao.findByGuid(guid)
-      )
-    )
+    SubscriptionsDao.findByGuid(guid) match {
+      case None => NotFound
+      case Some(sub) => Ok(Json.toJson(sub))
+    }
   }
 
   def post() = AnonymousRequest(parse.json) { request =>
