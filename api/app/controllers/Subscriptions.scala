@@ -35,8 +35,12 @@ object Subscriptions extends Controller {
   def getByGuid(guid: UUID) = Authenticated { request =>
     request.requireSystem()
     SubscriptionsDao.findByGuid(guid) match {
-      case None => NotFound
-      case Some(sub) => Ok(Json.toJson(sub))
+      case None => {
+        NotFound
+      }
+      case Some(sub) => {
+        Ok(Json.toJson(sub))
+      }
     }
   }
 
