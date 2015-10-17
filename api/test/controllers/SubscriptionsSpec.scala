@@ -4,6 +4,7 @@ import io.flow.splashpage.v0.{Authorization, Client}
 import io.flow.splashpage.v0.errors.ErrorsResponse
 import io.flow.splashpage.v0.models.{Publication, Subscription, SubscriptionForm}
 import java.util.UUID
+import scala.util.{Failure, Success, Try}
 
 import play.api.libs.ws._
 import play.api.test._
@@ -32,7 +33,24 @@ class SubscriptionsSpec extends PlaySpecification {
     )
   }
 
-/*
+  def expectError(f: => Unit, messages: Seq[String]) {
+    Try(
+      f
+    ) match {
+      case Success(_) => {
+        org.specs2.execute.Failure("Expected function to fail but it succeeded")
+      }
+      case Failure(ex) =>  ex match {
+        case e: ErrorsResponse => {
+          e.errors.map(_.message) must beEqualTo(messages)
+        }
+        case e => {
+          org.specs2.execute.Failure(s"Expected an exception of type[ErrorsResponse] but got[$e]")
+        }
+      }
+    }
+  }
+
   "POST /subscriptions" in new WithServer(port=port) {
     val form = createSubscriptionForm()
     val subscription = createSubscription(form)
@@ -41,11 +59,13 @@ class SubscriptionsSpec extends PlaySpecification {
   }
 
   "POST /subscriptions validates empty email" in new WithServer(port=port) {
-    intercept[ErrorsResponse] {
-      createSubscription(createSubscriptionForm().copy(email = "  "))
-    }.errors.map(_.message) must be(Seq("Email address cannot be empty"))
+    expectError(
+      createSubscription(createSubscriptionForm().copy(email = "  ")),
+      Seq("Email address cannot be empty")
+    )
   }
 
+/*
   "POST /subscriptions validates duplicate email" in new WithServer(port=port) {
     val form = createSubscriptionForm()
     createSubscription(form)
