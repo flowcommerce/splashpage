@@ -13,14 +13,14 @@ import io.flow.splashpage.v0.models.json._
 import io.flow.common.v0.models.json._
 import io.flow.splashpage.v0.errors.ErrorsResponse
 
-object SubscriptionsController extends Controller {
+object PublicationsController extends Controller {
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
   private lazy val anonClient = ApiClient(None).client
 
   def postSubscribe(publication: Publication) = Action.async { implicit request =>
-    val form = subscriptionForm.bindFromRequest
+    val form = publicationForm.bindFromRequest
     form.fold (
 
       errors => Future {
@@ -47,14 +47,14 @@ object SubscriptionsController extends Controller {
 
   }
 
-  case class SubscriptionData(
+  case class PublicationData(
     email: String
   )
 
-  val subscriptionForm = Form(
+  val publicationForm = Form(
     mapping(
       "email" -> nonEmptyText
-    )(SubscriptionData.apply)(SubscriptionData.unapply)
+    )(PublicationData.apply)(PublicationData.unapply)
   )
 
 }

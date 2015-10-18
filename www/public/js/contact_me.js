@@ -10,7 +10,7 @@ $(function() {
             // get values from FORM
             var email = $("input#email").val();
             $.ajax({
-                url: "/lists/launch",
+                url: "/publications/launch/subscribe",
                 type: "POST",
                 data: {
                     email: email
