@@ -21,10 +21,12 @@ object SubscriptionsController extends Controller {
     form.fold (
 
       errors => Future {
+        println("Got an invalid form: "+  errors)
         Ok(views.html.index(Some(errors)))
       },
 
       valid => {
+        println("Got a valid form: "+  valid)
         anonClient.subscriptions.post(
           SubscriptionForm(
             publication = publication,
@@ -50,7 +52,7 @@ object SubscriptionsController extends Controller {
 
   val subscriptionForm = Form(
     mapping(
-      "name" -> nonEmptyText
+      "email" -> nonEmptyText
     )(SubscriptionData.apply)(SubscriptionData.unapply)
   )
 
