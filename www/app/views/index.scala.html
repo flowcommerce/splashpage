@@ -1,35 +1,23 @@
 @(form: Option[play.api.data.Form[controllers.PublicationsController.PublicationData]] = None)
 
-@main(js = Seq("contact_me.js")) {
-     <!-- Contact Section -->
-    <section id="contact">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-12 text-center">
-            <h2 class="section-heading">flow.io</h2>
-          </div>
+@main(
+  js = Seq("subscribe.js")
+) {
+  <form action="#" method="post" class="validate" id="subscribe">
+    <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        
+        <div class="form-group">
+          <input name="email" class="form-control" placeholder="Your Email" id="email" required="" data-validation-required-message="Please enter your email address.">
+          <p class="help-block text-danger"></p>
         </div>
-        <div class="row">
-          <div class="col-lg-12">
-            <form action="@routes.PublicationsController.postSubscribe(io.flow.splashpage.v0.models.Publication.Launch)" method="post" class="validate">
-              <div class="row">
-                <div class="col-md-6 col-md-offset-3">
-                  
-                  <div class="form-group">
-                    <input name="email" class="form-control" placeholder="Your Email" id="email" required="" data-validation-required-message="Please enter your email address.">
-                    <p class="help-block text-danger"></p>
-                  </div>
-                  
-                </div>                
-                <div class="clearfix"></div>
-                <div class="col-lg-12 text-center">
-                  <div id="success"></div>
-                  <button type="submit" class="btn btn-xl">tell me when you launch</button>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
+        
+      </div>      
+      <div class="clearfix"></div>
+      <div class="col-lg-12 text-center">
+        <div id="success"></div>
+        <button type="submit" class="btn btn-xl">tell me when you launch</button>
       </div>
-    </section>
+    </div>
+  </form>
 }

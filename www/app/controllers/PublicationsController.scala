@@ -37,7 +37,7 @@ object PublicationsController extends Controller {
           Ok(Json.toJson(sub))
         }.recover {
           case r: ErrorsResponse => {
-            BadRequest(Json.toJson(r.errors))
+            Conflict(Json.toJson(Map("errors" -> r.errors.map(_.message).mkString(", "))))
           }
         }
       }

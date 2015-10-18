@@ -87,7 +87,7 @@ class SubscriptionsSpec extends PlaySpecification {
   "POST /subscriptions validates invalid email" in new WithServer(port=port) {
     expectErrors {
       createSubscription(createSubscriptionForm().copy(email = "test"))
-    }.errors.map(_.message) must beEqualTo(Seq("Invalid email address"))
+    }.errors.map(_.message) must beEqualTo(Seq("Please enter a valid email address"))
   }
 
   "POST /subscriptions validates duplicate email" in new WithServer(port=port) {

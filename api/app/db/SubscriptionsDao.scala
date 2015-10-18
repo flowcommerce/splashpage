@@ -39,7 +39,7 @@ object SubscriptionsDao {
       Seq("Email address cannot be empty")
 
     } else if (!isValidEmail(form.email)) {
-      Seq("Invalid email address")
+      Seq("Please enter a valid email address")
 
     } else {
       SubscriptionsDao.findAll(

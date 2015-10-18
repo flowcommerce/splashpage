@@ -248,9 +248,10 @@ package io.flow.splashpage.v0 {
         val payload = play.api.libs.json.Json.toJson(subscriptionForm)
 
         _executeRequest("POST", s"/subscriptions", body = Some(payload)).map {
+          case r if r.status == 200 => _root_.io.flow.splashpage.v0.Client.parseJson("io.flow.splashpage.v0.models.Subscription", r, _.validate[io.flow.splashpage.v0.models.Subscription])
           case r if r.status == 201 => _root_.io.flow.splashpage.v0.Client.parseJson("io.flow.splashpage.v0.models.Subscription", r, _.validate[io.flow.splashpage.v0.models.Subscription])
           case r if r.status == 409 => throw new io.flow.splashpage.v0.errors.ErrorsResponse(r)
-          case r => throw new io.flow.splashpage.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 201, 409")
+          case r => throw new io.flow.splashpage.v0.errors.FailedRequest(r.status, s"Unsupported response code[${r.status}]. Expected: 200, 201, 409")
         }
       }
 

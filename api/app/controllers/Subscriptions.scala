@@ -47,17 +47,27 @@ object Subscriptions extends Controller {
   def post() = AnonymousRequest(parse.json) { request =>
     request.body.validate[SubscriptionForm] match {
       case e: JsError => {
-        BadRequest(Json.toJson(Validation.invalidJson(e)))
+        Conflict(Json.toJson(Validation.invalidJson(e)))
       }
       case s: JsSuccess[SubscriptionForm] => {
         val form = s.get
-        SubscriptionsDao.validate(form) match {
-          case Nil => {
-            val subscription = SubscriptionsDao.create(request.user, form)
-            Created(Json.toJson(subscription))
+        SubscriptionsDao.findAll(
+          publication = Some(form.publication),
+          email = Some(form.email)
+        ).headOption match {
+          case Some(subscription) => {
+            Ok(Json.toJson(subscription))
           }
-          case errors => {
-            Conflict(Json.toJson(errors))
+          case None => {
+            SubscriptionsDao.validate(form) match {
+              case Nil => {
+                val subscription = SubscriptionsDao.create(request.user, form)
+                Created(Json.toJson(subscription))
+              }
+              case errors => {
+                Conflict(Json.toJson(errors))
+              }
+            }
           }
         }
       }

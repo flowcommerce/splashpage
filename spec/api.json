@@ -83,7 +83,8 @@
                     "description": "Create a new subscription.",
                     "body": { "type": "subscription_form" },
                     "responses": {
-                        "201": { "type": "subscription" },
+                        "200": { "type": "subscription", "description": "Indicates that request was successful, but email address was already subscribed. We return the original subscription record" },
+                        "201": { "type": "subscription", "description": "A new subscription has been created" },
                         "409": { "type": "[io.flow.common.v0.models.error]" }
                     }
                 },
