@@ -1,31 +1,85 @@
 @(
-  title: String,
-  headTitle: Option[String] = None
+  title: Option[String] = None,
+  headTitle: Option[String] = None,
+  js: Seq[String] = Nil
 )(content: Html)
 
 <!DOCTYPE html>
-<html>
-<head>
-    <title>@headTitle.getOrElse(title)</title>
-    <link rel='shortcut icon' type='image/png' href='@routes.Assets.at("images/favicon.png")'>
-    <link rel='stylesheet' href='@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.css"))'>
-    <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("jquery.min.js"))'></script>
-    <style>
-    body {
-        margin-top: 50px;
-    }
-    </style>
-</head>
-<body>
-    <div class="navbar navbar-fixed-top">
-        <div class="navbar-inner">
-            <div class="container-fluid">
-                <a id="titleLink" class="brand" href="/">@title</a>
-            </div>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>@headTitle.getOrElse(title.getOrElse("flow.io"))</title>
+    <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
+    <link rel="stylesheet" href="@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.css"))">
+    
+    <!-- Custom CSS -->
+    <link href="@routes.Assets.at("css/main.css")" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="http://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href="http://fonts.googleapis.com/css?family=Kaushan+Script" rel="stylesheet" type="text/css">
+    <link href="http://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+    <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700" rel="stylesheet" type="text/css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+  </head>
+
+  <body id="page-top" class="index">
+    
+@content
+
+
+    <footer>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-4">
+          </div>
+          <div class="col-md-4">
+            <ul class="list-inline social-buttons">
+              <li><a href="http://twitter.com/flowcommerce"><i class="fa fa-twitter"></i></a>
+              </li>
+              <li><a href="http://facebook.com/flowcommerce"><i class="fa fa-facebook"></i></a>
+              </li>
+            </ul>
+          </div>
+          <div class="col-md-4">
+            <span class="copyright">Copyright © Flow Commerce, Inc. 2015</span>
+          </div>
         </div>
-    </div>
-    <div class="container">
-        @content
-    </div>
-</body>
+      </div>
+    </footer>
+
+
+    <!-- jQuery -->
+    <script type="text/javascript" src="@routes.WebJarAssets.at(WebJarAssets.locate("jquery.min.js"))"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+    <script src="@routes.Assets.at("js/classie.js")"></script>
+    <script src="@routes.Assets.at("js/cbpAnimatedHeader.js")"></script>
+
+    <!-- Contact Form JavaScript -->
+    <script src="@routes.Assets.at("js/jqBootstrapValidation.js")"></script>
+    @js.map { path =>
+      <script src="@routes.Assets.at(path)"></script>
+    }
+
+    <!-- Custom Theme JavaScript -->
+    <script src="@routes.Assets.at("js/agency.js")"></script>
+  </body>
 </html>
+
