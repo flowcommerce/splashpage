@@ -13,11 +13,13 @@ class SubscriptionsSpec extends PlaySpecification {
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
+  private val DevelopmentSystemUserToken = "development"
+
   private val port = 9010
   lazy val anonClient = new Client(s"http://localhost:$port")
   lazy val systemClient = new Client(
     s"http://localhost:$port",
-    Some(Authorization.Basic(db.UsersDao.SystemUserToken))
+    Some(Authorization.Basic(DevelopmentSystemUserToken))
   )
 
   def createSubscription(

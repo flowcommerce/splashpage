@@ -45,7 +45,7 @@ private[controllers] object RequestHelper {
 
 class AnonymousRequest[A](
   val authHeaders: AuthHeaders,
-  val user: User,
+  val user: Option[User],
   request: Request[A]
 ) extends WrappedRequest[A](request)
 
@@ -58,7 +58,7 @@ object AnonymousRequest extends ActionBuilder[AnonymousRequest] {
     block(
       new AnonymousRequest(
         authHeaders = headers,
-        user = userAuth.user.getOrElse { UsersDao.Anonymous },
+        user = userAuth.user,
         request = request
       )
     )

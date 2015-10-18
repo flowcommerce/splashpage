@@ -59,7 +59,7 @@ object SubscriptionsDao {
     email.indexOf("@") >= 0
   }
 
-  def create(createdBy: User, form: SubscriptionForm): Subscription = {
+  def create(createdBy: Option[User], form: SubscriptionForm): Subscription = {
     val errors = validate(form)
     assert(errors.isEmpty, errors.map(_.message).mkString("\n"))
 
@@ -70,7 +70,7 @@ object SubscriptionsDao {
         'guid -> guid,
         'publication -> form.publication.toString,
         'email -> form.email.trim,
-        'created_by_guid -> createdBy.guid
+        'created_by_guid -> createdBy.getOrElse(UsersDao.anonymousUser).guid
       ).execute()
     }
 

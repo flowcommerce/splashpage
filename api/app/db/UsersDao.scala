@@ -1,27 +1,86 @@
 package db
 
+import io.flow.common.v0.models.Audit
 import java.util.UUID
+import anorm._
+import play.api.db._
+import play.api.Play.current
 
-case class User(guid: UUID)
+case class User(
+  guid: UUID,
+  emails: Seq[String],
+  audit: Audit
+)
 
 // Placeholder
 object UsersDao {
 
-   
-  val Anonymous = User(guid = UUID.fromString("85ae1119-4c98-4738-8204-c899b77c971b"))
-  val System = User(guid = UUID.fromString("97098f36-a6fe-4fdd-aa29-00632988bd83"))
+  private val OttoEmailAddress = "otto@flow.io"
+  private val AnonymousEmailAddress = "anonymous@flow.io"
 
-  val SystemUserToken = "TODO"
+  private[this] val BaseQuery = s"""
+    select users.guid,
+           (select array_agg(email) from emails where user_guid=users.guid) as emails,
+           ${AuditsDao.queryCreation("users")}
+      from users
+     where true
+  """
 
-  def findByToken(token: String): Option[User] = {
-    token match {
-      case `SystemUserToken` => Some(System)
-      case _ => None
+  lazy val anonymousUser: User = {
+    findAll(email = Some(AnonymousEmailAddress), limit = 1).headOption.getOrElse {
+      sys.error(s"Could not find anonymous user[$AnonymousEmailAddress]")
     }
   }
 
+  def findByToken(token: String): Option[User] = {
+    findAll(token = Some(token)).headOption
+  }
+
   def isSystemUser(user: User): Boolean = {
-    user.guid == System.guid
+    user.emails.contains(OttoEmailAddress)
+  }
+
+  def findByGuid(guid: UUID): Option[User] = {
+    findAll(guid = Some(guid), limit = 1).headOption
+  }
+
+  def findAll(
+    guid: Option[UUID] = None,
+    email: Option[String] = None,
+    token: Option[String] = None,
+    isDeleted: Option[Boolean] = Some(false),
+    limit: Long = 25,
+    offset: Long = 0
+  ): Seq[User] = {
+    val sql = Seq(
+      Some(BaseQuery.trim),
+      guid.map { v => "and users.guid = {guid}::uuid" },
+      email.map { v => "and lower(users.email) = lower(trim({email}))" },
+      token.map { v => "and users.guid = (select user_guid from tokens where token = trim({token}) and deleted_at is null)" },
+      isDeleted.map(Filters.isDeleted("users", _)),
+      Some(s"order by users.created_at limit ${limit} offset ${offset}")
+    ).flatten.mkString("\n   ")
+
+    val bind = Seq[Option[NamedParameter]](
+      guid.map('guid -> _.toString),
+      email.map('email -> _.toString),
+      token.map('token -> _.toString)
+    ).flatten
+
+    DB.withConnection { implicit c =>
+      SQL(sql).on(bind: _*)().toList.map { fromRow(_) }.toSeq
+    }
+  }
+
+  private[db] def fromRow(
+    row: anorm.Row
+  ): User = {
+    User(
+      guid = row[UUID]("guid"),
+      emails = row[List[String]]("emails").toSeq,
+      audit = AuditsDao.fromRowCreation(row)
+    )
   }
 
 }
+
