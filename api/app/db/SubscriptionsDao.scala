@@ -37,6 +37,10 @@ object SubscriptionsDao {
 
     val emailErrors = if (form.email.trim == "") {
       Seq("Email address cannot be empty")
+
+    } else if (!isValidEmail(form.email)) {
+      Seq("Invalid email address")
+
     } else {
       SubscriptionsDao.findAll(
         email = Some(form.email),
@@ -49,6 +53,10 @@ object SubscriptionsDao {
     }
 
     Validation.errors(publicationErrors ++ emailErrors)
+  }
+
+  private def isValidEmail(email: String): Boolean = {
+    email.indexOf("@") >= 0
   }
 
   def create(createdBy: User, form: SubscriptionForm): Subscription = {
