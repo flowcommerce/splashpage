@@ -94,18 +94,15 @@ class SubscriptionsSpec extends PlaySpecification {
 
   "POST /subscriptions validates duplicate email" in new WithServer(port=port) {
     val form = createSubscriptionForm()
-    createSubscription(form)
-    expectErrors {
-      createSubscription(form.copy(email = " " + form.email + " "))
-    }.errors.map(_.message) must beEqualTo(Seq("Email is already subscribed"))
+    val sub = createSubscription(form)
 
-    expectErrors {
-      createSubscription(form.copy(email = " " + form.email.toUpperCase + " "))
-    }.errors.map(_.message) must beEqualTo(Seq("Email is already subscribed"))
+    createSubscription(form.copy(email = " " + form.email + " "))
+    createSubscription(form.copy(email = " " + form.email.toUpperCase + " "))
+    createSubscription(form.copy(email = form.email.toLowerCase))
 
-    expectErrors {
-      createSubscription(form.copy(email = form.email.toLowerCase))
-    }.errors.map(_.message) must beEqualTo(Seq("Email is already subscribed"))
+    await(
+      systemClient.subscriptions.getByGuid(sub.guid)
+    ).email must beEqualTo(form.email)
   }
 
   "POST /subscriptions validates publication" in new WithServer(port=port) {
