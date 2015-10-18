@@ -6,17 +6,17 @@ import anorm._
 import play.api.db._
 import play.api.Play.current
 
+// Placeholder
 case class User(
   guid: UUID,
   emails: Seq[String],
   audit: Audit
 )
 
-// Placeholder
 object UsersDao {
 
-  private val OttoEmailAddress = "otto@flow.io"
-  private val AnonymousEmailAddress = "anonymous@flow.io"
+  private[db] val SystemEmailAddress = "otto@flow.io"
+  private[db] val AnonymousEmailAddress = "anonymous@flow.io"
 
   private[this] val BaseQuery = s"""
     select users.guid,
@@ -32,12 +32,22 @@ object UsersDao {
     }
   }
 
+  lazy val systemUser: User = {
+    findAll(email = Some(SystemEmailAddress), limit = 1).headOption.getOrElse {
+      sys.error(s"Could not find system user[$SystemEmailAddress]")
+    }
+  }
+
   def findByToken(token: String): Option[User] = {
     findAll(token = Some(token)).headOption
   }
 
   def isSystemUser(user: User): Boolean = {
-    user.emails.contains(OttoEmailAddress)
+    user.emails.contains(SystemEmailAddress)
+  }
+
+  def findByEmail(email: String): Option[User] = {
+    findAll(email = Some(email), limit = 1).headOption
   }
 
   def findByGuid(guid: UUID): Option[User] = {
@@ -55,7 +65,7 @@ object UsersDao {
     val sql = Seq(
       Some(BaseQuery.trim),
       guid.map { v => "and users.guid = {guid}::uuid" },
-      email.map { v => "and lower(users.email) = lower(trim({email}))" },
+      email.map { v => "and users.guid = (select user_guid from emails where lower(email) = lower(trim({email})) and deleted_at is null)" },
       token.map { v => "and users.guid = (select user_guid from tokens where token = trim({token}) and deleted_at is null)" },
       isDeleted.map(Filters.isDeleted("users", _)),
       Some(s"order by users.created_at limit ${limit} offset ${offset}")
