@@ -30,7 +30,7 @@ lazy val api = project
       jdbc,
       "com.typesafe.play" %% "anorm" % "2.4.0",
       "org.postgresql" % "postgresql" % "9.4-1202-jdbc42",
-      "org.scalatestplus" %% "play" % "1.2.0" % "test"
+      "org.scalatestplus" %% "play" % "1.4.0-M4" % "test"
     )
   )
 
