@@ -15,7 +15,7 @@
     },
 
     "models": {
-
+	    
 	"subscription": {
 	    "description": "Represents an email address that is currently subscribed to a publication",
 	    "fields": [
