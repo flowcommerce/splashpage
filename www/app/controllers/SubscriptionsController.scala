@@ -4,10 +4,13 @@ import play.api._
 import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
+import play.api.libs.json._
 import scala.concurrent.Future
 
 import lib.ApiClient
 import io.flow.splashpage.v0.models.{Publication, SubscriptionForm}
+import io.flow.splashpage.v0.models.json._
+import io.flow.common.v0.models.json._
 import io.flow.splashpage.v0.errors.ErrorsResponse
 
 object SubscriptionsController extends Controller {
@@ -21,22 +24,20 @@ object SubscriptionsController extends Controller {
     form.fold (
 
       errors => Future {
-        println("Got an invalid form: "+  errors)
         Ok(views.html.index(Some(errors)))
       },
 
       valid => {
-        println("Got a valid form: "+  valid)
         anonClient.subscriptions.post(
           SubscriptionForm(
             publication = publication,
             email = valid.email
           )
         ).map { sub =>
-          sys.error("TODO: Success: " + sub)
+          Ok(Json.toJson(sub))
         }.recover {
           case r: ErrorsResponse => {
-            sys.error("TODO: Error: " + r.errors.map(_.message))
+            BadRequest(Json.toJson(r.errors))
           }
         }
       }
