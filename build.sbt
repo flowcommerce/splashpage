@@ -56,5 +56,6 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
     "org.scalatest" %% "scalatest" % "2.2.0" % Test
   ),
   scalacOptions += "-feature",
-  coverageHighlighting := true
+  coverageHighlighting := true,
+  resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
 )
