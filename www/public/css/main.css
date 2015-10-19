@@ -651,9 +651,16 @@ aside.clients img {
     margin: 50px auto;
 }
 
-section#contact {
+section.contact_image {
     background-color: #222;
     background-image: url(/assets/images/header/world.png);
+}
+
+section.contact_video {
+    background-color: #000;
+}
+
+section#contact {
     background-position: center;
     background-repeat: no-repeat;
 }

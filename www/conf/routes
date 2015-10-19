@@ -1,5 +1,6 @@
 GET     /_internal_/healthcheck                 controllers.HealthchecksController.index()
-GET     /                                       controllers.ApplicationController.index()
+GET     /                                       controllers.ApplicationController.index(video: Option[Int])
+GET     /videos                                 controllers.ApplicationController.videos()
 
 POST    /publications/:publication/subscribe    controllers.PublicationsController.postSubscribe(publication: io.flow.splashpage.v0.models.Publication)
 
