@@ -22,6 +22,7 @@
 		{ "name": "guid", "type": "uuid", "description": "Internal unique identifier for this subscription" },
 		{ "name": "email", "type": "string", "description": "Case insensitive email address to which to send notifications for this subscription" },
 		{ "name": "publication", "type": "publication" },
+		{ "name": "geo", "type": "geo", "required": false },
                 { "name": "audit", "type": "io.flow.common.v0.models.audit" }
 	    ]
 	},
@@ -29,7 +30,16 @@
 	"subscription_form": {
 	    "fields": [
 		{ "name": "email", "type": "string" },
-		{ "name": "publication", "type": "publication" }
+		{ "name": "publication", "type": "publication" },
+		{ "name": "geo", "type": "geo", "required": false }
+	    ]
+	},
+
+	"geo": {
+	    "fields": [
+		{ "name": "ip_address", "type": "string", "required": false },
+		{ "name": "latitude", "type": "string", "required": false, "description": "If specified, must also specify longitude" },
+		{ "name": "longitude", "type": "string", "required": false, "description": "If specified, must also specify latitude" }
 	    ]
 	}
 

@@ -1,7 +1,7 @@
 package db
 
 import io.flow.common.v0.models.Error
-import io.flow.splashpage.v0.models.{Publication, Subscription, SubscriptionForm}
+import io.flow.splashpage.v0.models.{Geo, Publication, Subscription, SubscriptionForm}
 import anorm._
 import lib.Validation
 import play.api.db._
@@ -15,6 +15,9 @@ object SubscriptionsDao {
     select subscriptions.guid,
            subscriptions.publication,
            subscriptions.email,
+           subscriptions.ip_address,
+           subscriptions.latitude,
+           subscriptions.longitude,
            ${AuditsDao.queryCreation("subscriptions")}
       from subscriptions
      where true
@@ -22,10 +25,17 @@ object SubscriptionsDao {
 
   private[this] val InsertQuery = """
     insert into subscriptions
-    (guid, email, publication, created_by_guid)
+    (guid, email, publication, ip_address, latitude, longitude, created_by_guid)
     values
-    ({guid}::uuid, {email}, {publication}, {created_by_guid}::uuid)
+    ({guid}::uuid, {email}, {publication}, {ip_address}, {latitude}, {longitude}, {created_by_guid}::uuid)
   """
+
+  private def stringToTrimmedOption(value: String): Option[String] = {
+    value.trim match {
+      case "" => None
+      case trimmed => Some(trimmed)
+    }
+  }
 
   def validate(
     form: SubscriptionForm
@@ -52,7 +62,24 @@ object SubscriptionsDao {
       }
     }
 
-    Validation.errors(publicationErrors ++ emailErrors)
+    val geoErrors = form.geo match {
+      case None => {
+        Nil
+      }
+      case Some(geo) => {
+        (geo.latitude, geo.longitude) match {
+          case (None, None) | (Some(_), Some(_)) => Nil
+          case (Some(_), None) => {
+            Seq("If specifying latitude, must also specify longitude")
+          }
+          case (None, Some(_)) => {
+            Seq("If specifying longitude, must also specify latitude")
+          }
+        }
+      }
+    }
+
+    Validation.errors(publicationErrors ++ emailErrors ++ geoErrors)
   }
 
   private def isValidEmail(email: String): Boolean = {
@@ -70,6 +97,9 @@ object SubscriptionsDao {
         'guid -> guid,
         'publication -> form.publication.toString,
         'email -> form.email.trim,
+        'ip_address -> form.geo.flatMap(_.ipAddress).flatMap(stringToTrimmedOption(_)),
+        'latitude -> form.geo.flatMap(_.latitude).flatMap(stringToTrimmedOption(_)),
+        'longitude -> form.geo.flatMap(_.longitude).flatMap(stringToTrimmedOption(_)),
         'created_by_guid -> createdBy.getOrElse(UsersDao.anonymousUser).guid
       ).execute()
     }
@@ -122,8 +152,24 @@ object SubscriptionsDao {
       guid = row[UUID]("guid"),
       email = row[String]("email"),
       publication = Publication(row[String]("publication")),
+      geo = geoFromRow(row),
       audit = AuditsDao.fromRowCreation(row)
     )
+  }
+
+  private[db] def geoFromRow(
+    row: anorm.Row
+  ): Option[Geo] = {
+    val geo = Geo(
+      ipAddress = row[Option[String]]("ip_address"),
+      latitude = row[Option[String]]("latitude"),
+      longitude = row[Option[String]]("longitude")
+    )
+
+    geo match {
+      case Geo(None, None, None) => None
+      case _ => Some(geo)
+    }
   }
 
 }
