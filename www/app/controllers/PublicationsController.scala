@@ -13,7 +13,16 @@ import io.flow.splashpage.v0.models.json._
 import io.flow.common.v0.models.json._
 import io.flow.splashpage.v0.errors.ErrorsResponse
 
-object PublicationsController extends Controller {
+object PublicationsController {
+
+  case class PublicationData(
+    email: String
+  )
+
+}
+
+
+class PublicationsController() extends Controller {
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -47,14 +56,10 @@ object PublicationsController extends Controller {
 
   }
 
-  case class PublicationData(
-    email: String
-  )
-
   val publicationForm = Form(
     mapping(
       "email" -> nonEmptyText
-    )(PublicationData.apply)(PublicationData.unapply)
+    )(PublicationsController.PublicationData.apply)(PublicationsController.PublicationData.unapply)
   )
 
 }
