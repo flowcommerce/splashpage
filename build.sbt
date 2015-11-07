@@ -27,6 +27,7 @@ lazy val api = project
   .settings(commonSettings: _*)
   .settings(
     routesImport += "io.flow.splashpage.v0.Bindables._",
+    routesGenerator := InjectedRoutesGenerator,
     libraryDependencies ++= Seq(
       "io.flow" %% "lib-play" % "0.0.1-SNAPSHOT",
       "io.flow" %% "lib-play-postgresql" % "0.0.1-SNAPSHOT",
@@ -42,6 +43,7 @@ lazy val www = project
   .settings(commonSettings: _*)
   .settings(
     routesImport += "io.flow.splashpage.v0.Bindables._",
+    routesGenerator := InjectedRoutesGenerator,
     libraryDependencies ++= Seq(
       "org.webjars" %% "webjars-play" % "2.4.0-1",
       "org.webjars" % "bootstrap" % "3.3.5",

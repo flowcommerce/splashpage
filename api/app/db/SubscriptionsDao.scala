@@ -3,6 +3,7 @@ package db
 import io.flow.common.v0.models.Error
 import io.flow.user.v0.models.User
 import io.flow.splashpage.v0.models.{Geo, Publication, Subscription, SubscriptionForm}
+import io.flow.play.clients.UserClient
 import io.flow.play.postgresql.{AuditsDao, Filters, SoftDelete}
 import io.flow.play.util.Validation
 import anorm._
@@ -102,7 +103,7 @@ object SubscriptionsDao {
         'ip_address -> form.geo.flatMap(_.ipAddress).flatMap(stringToTrimmedOption(_)),
         'latitude -> form.geo.flatMap(_.latitude).flatMap(stringToTrimmedOption(_)),
         'longitude -> form.geo.flatMap(_.longitude).flatMap(stringToTrimmedOption(_)),
-        'created_by_guid -> createdBy.getOrElse(UsersDao.anonymousUser).guid
+        'created_by_guid -> createdBy.map(_.guid).getOrElse(UserClient.AnonymousUserGuid)
       ).execute()
     }
 

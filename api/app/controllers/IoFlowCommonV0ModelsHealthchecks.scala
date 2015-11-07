@@ -7,7 +7,7 @@ import play.api._
 import play.api.mvc._
 import play.api.libs.json._
 
-object IoFlowCommonV0ModelsHealthchecks extends Controller {
+class IoFlowCommonV0ModelsHealthchecks extends Controller {
 
   private val HealthyJson = Json.toJson(Healthcheck(status = "healthy"))
 
