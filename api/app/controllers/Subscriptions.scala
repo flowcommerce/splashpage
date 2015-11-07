@@ -1,7 +1,7 @@
 package controllers
 
 import db.SubscriptionsDao
-import io.flow.play.clients.{UserTokenClient, AuthorizationsClient}
+import io.flow.play.clients.{UserTokenClient, AuthorizationClient}
 import io.flow.splashpage.v0.models.{Publication, Subscription, SubscriptionForm}
 import io.flow.splashpage.v0.models.json._
 import io.flow.play.util.Validation
@@ -13,7 +13,7 @@ import scala.concurrent.Future
 
 class Subscriptions @javax.inject.Inject() (
   val userTokensClient: UserTokenClient,
-  val authorizationsClient: AuthorizationsClient
+  val authorizationClient: AuthorizationClient
 ) extends Controller
     with io.flow.play.controllers.AuthorizedRestController
 {
