@@ -10,42 +10,6 @@ object ApiClient {
 
   private[this] val unauthenticatedClient = ApiClient(None).client
 
-  def callWith404[T](
-    f: Future[T]
-  )(implicit ec: ExecutionContext): Future[Option[T]] = {
-    f.map {
-      value => Some(value)
-    }.recover {
-      case io.flow.splashpage.v0.errors.UnitResponse(404) => None
-      case ex: Throwable => throw ex
-    }
-  }
-
-  def awaitCallWith404[T](
-    future: Future[T]
-  )(implicit ec: ExecutionContext): Option[T] = {
-    Await.result(
-      callWith404(future),
-      1000.millis
-    )
-  }
-
-  /**
-    * Blocking call to fetch a user. If the provided guid is not a
-    * valid UUID, returns none.
-    */
-  def getUser(
-    guid: String
-  )(implicit ec: ExecutionContext): Option[User] = {
-    Try(UUID.fromString(guid)) match {
-      case Success(userGuid) => {
-        // TODO: awaitCallWith404( unauthenticatedClient.users.getByGuid(userGuid) )
-        None
-      }
-      case Failure(ex) => None
-    }
-  }
-
 }
 
 case class ApiClient(user: Option[User]) {
