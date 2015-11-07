@@ -7,7 +7,7 @@ import play.api.data.Forms._
 import play.api.libs.json._
 import scala.concurrent.Future
 
-import lib.ApiClient
+import lib.SplashpageClient
 import io.flow.splashpage.v0.models.{Publication, SubscriptionForm}
 import io.flow.splashpage.v0.models.json._
 import io.flow.common.v0.models.json._
@@ -21,12 +21,13 @@ object PublicationsController {
 
 }
 
-
-class PublicationsController() extends Controller {
+class PublicationsController @javax.inject.Inject() (
+  val splashpageClient: lib.SplashpageClient
+) extends Controller {
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  private lazy val anonClient = ApiClient(None).client
+  private lazy val anonClient = splashpageClient.newClient(None)
 
   def postSubscribe(publication: Publication) = Action.async { implicit request =>
     val form = publicationForm.bindFromRequest
