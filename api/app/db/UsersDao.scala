@@ -1,17 +1,12 @@
 package db
 
 import io.flow.common.v0.models.Audit
+import io.flow.user.v0.models.User
+import io.flow.play.postgresql.{AuditsDao, Filters}
 import java.util.UUID
 import anorm._
 import play.api.db._
 import play.api.Play.current
-
-// Placeholder
-case class User(
-  guid: UUID,
-  emails: Seq[String],
-  audit: Audit
-)
 
 object UsersDao {
 
@@ -43,7 +38,7 @@ object UsersDao {
   }
 
   def isSystemUser(user: User): Boolean = {
-    user.emails.contains(SystemEmailAddress)
+    user.email == Some(SystemEmailAddress)
   }
 
   def findByEmail(email: String): Option[User] = {
@@ -87,7 +82,7 @@ object UsersDao {
   ): User = {
     User(
       guid = row[UUID]("guid"),
-      emails = row[List[String]]("emails").toSeq,
+      email = row[List[String]]("emails").toSeq.headOption,
       audit = AuditsDao.fromRowCreation(row)
     )
   }

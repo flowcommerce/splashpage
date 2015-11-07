@@ -1,9 +1,9 @@
 package controllers
 
 import db.SubscriptionsDao
-import lib.Validation
 import io.flow.splashpage.v0.models.{Publication, Subscription, SubscriptionForm}
 import io.flow.splashpage.v0.models.json._
+import io.flow.play.util.Validation
 import io.flow.common.v0.models.json._
 import play.api.mvc._
 import play.api.libs.json._

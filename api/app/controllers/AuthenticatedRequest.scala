@@ -1,6 +1,7 @@
 package controllers
 
-import db.{User, UsersDao}
+import io.flow.user.v0.models.User
+import db.UsersDao
 import play.api.mvc._
 import play.api.mvc.Results.Unauthorized
 import scala.concurrent.Future

@@ -3,6 +3,8 @@ import scoverage.ScoverageSbtPlugin.ScoverageKeys._
 
 name := "splashpage"
 
+organization := "io.flow"
+
 scalaVersion in ThisBuild := "2.11.7"
 
 // required because of issue between scoverage & sbt
@@ -26,11 +28,9 @@ lazy val api = project
   .settings(
     routesImport += "io.flow.splashpage.v0.Bindables._",
     libraryDependencies ++= Seq(
-      ws,
-      jdbc,
-      "com.typesafe.play" %% "anorm" % "2.4.0",
-      "org.postgresql" % "postgresql" % "9.4-1202-jdbc42",
-      "org.scalatestplus" %% "play" % "1.4.0-M4" % "test"
+      "io.flow" %% "lib-play" % "0.0.1-SNAPSHOT",
+      "io.flow" %% "lib-play-postgresql" % "0.0.1-SNAPSHOT",
+      "org.postgresql" % "postgresql" % "9.4-1202-jdbc42"
     )
   )
 
@@ -57,5 +57,6 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
   ),
   scalacOptions += "-feature",
   coverageHighlighting := true,
-  resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
+  resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases",
+  credentials += Credentials(Path.userHome / ".ivy2" / ".artifactory")
 )

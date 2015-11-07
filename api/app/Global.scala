@@ -1,6 +1,5 @@
-import lib.Validation
-
 import io.flow.common.v0.models.json._
+import io.flow.play.util.Validation
 import play.api._
 import play.api.mvc._
 import play.api.libs.json._
