@@ -1,5 +1,6 @@
 {
     "name": "splashpage",
+    "base_url": "http://api.flow.io",
 
     "imports": [
 	{ "uri": "http://www.apidoc.me/flow/common/0.0.1-dev/service.json" }
