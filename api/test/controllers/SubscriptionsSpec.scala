@@ -3,6 +3,8 @@ package controllers
 import io.flow.splashpage.v0.{Authorization, Client}
 import io.flow.splashpage.v0.errors.{ErrorsResponse, UnitResponse}
 import io.flow.splashpage.v0.models.{Geo, Publication, Subscription, SubscriptionForm}
+import io.flow.user.v0.models.User
+import io.flow.play.clients.{MockAuthorizationClient, MockUserClient}
 import java.util.UUID
 import scala.util.{Failure, Success, Try}
 
@@ -13,14 +15,18 @@ class SubscriptionsSpec extends PlaySpecification {
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  private val DevelopmentSystemUserToken = "development"
-
   private val port = 9010
   lazy val anonClient = new Client(s"http://localhost:$port")
-  lazy val systemClient = new Client(
-    s"http://localhost:$port",
-    Some(Authorization.Basic(DevelopmentSystemUserToken))
-  )
+  lazy val identifiedClient = {
+    val user = MockUserClient.makeUser()
+    val token = "abcdefghijklmnopqrstuvwxyz"
+    MockUserClient.add(user, token = Some(token))
+    MockAuthorizationClient.grantAll(user.guid)
+    new Client(
+      s"http://localhost:$port",
+      Some(Authorization.Basic(token))
+    )
+  }
 
   def createSubscription(
     form: SubscriptionForm = createSubscriptionForm()
@@ -101,7 +107,7 @@ class SubscriptionsSpec extends PlaySpecification {
     createSubscription(form.copy(email = form.email.toLowerCase))
 
     await(
-      systemClient.subscriptions.getByGuid(sub.guid)
+      identifiedClient.subscriptions.getByGuid(sub.guid)
     ).email must beEqualTo(form.email)
   }
 
@@ -166,7 +172,7 @@ class SubscriptionsSpec extends PlaySpecification {
   "GET /subscriptions/:guid" in new WithServer(port=port) {
     val sub = createSubscription()
     await(
-      systemClient.subscriptions.getByGuid(sub.guid)
+      identifiedClient.subscriptions.getByGuid(sub.guid)
     ) must beEqualTo(sub)
   }
 
@@ -192,7 +198,7 @@ class SubscriptionsSpec extends PlaySpecification {
   "GET /subscriptions/:guid w/ invalid guid returns 404" in new WithServer(port=port) {
     expectStatus(404,
       await(
-        systemClient.subscriptions.getByGuid(UUID.randomUUID)
+        identifiedClient.subscriptions.getByGuid(UUID.randomUUID)
       )
     )
   }
@@ -200,29 +206,29 @@ class SubscriptionsSpec extends PlaySpecification {
   "GET /subscriptions by guid" in new WithServer(port=port) {
     val sub = createSubscription()
     await(
-      systemClient.subscriptions.get(guid = Some(sub.guid))
+      identifiedClient.subscriptions.get(guid = Some(sub.guid))
     ) must beEqualTo(Seq(sub))
 
     await(
-        systemClient.subscriptions.get(guid = Some(UUID.randomUUID))
+        identifiedClient.subscriptions.get(guid = Some(UUID.randomUUID))
     ) must beEqualTo(Nil)
   }
 
   "GET /subscriptions by email" in new WithServer(port=port) {
     val sub = createSubscription()
     await(
-      systemClient.subscriptions.get(email = Some(sub.email))
+      identifiedClient.subscriptions.get(email = Some(sub.email))
     ) must beEqualTo(Seq(sub))
 
     await(
-      systemClient.subscriptions.get(email = Some(UUID.randomUUID + "@flow.io"))
+      identifiedClient.subscriptions.get(email = Some(UUID.randomUUID + "@flow.io"))
     ) must beEqualTo(Nil)
   }
 
   "GET /subscriptions by publication" in new WithServer(port=port) {
     val sub = createSubscription()
     await(
-      systemClient.subscriptions.get(email = Some(sub.email), publication = Some(sub.publication))
+      identifiedClient.subscriptions.get(email = Some(sub.email), publication = Some(sub.publication))
     ) must beEqualTo(Seq(sub))
   }
 
