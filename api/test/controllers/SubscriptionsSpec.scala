@@ -11,100 +11,36 @@ import scala.util.{Failure, Success, Try}
 import play.api.libs.ws._
 import play.api.test._
 
-class SubscriptionsSpec extends PlaySpecification {
+class SubscriptionsSpec extends PlaySpecification with MockClient {
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  private val port = 9010
-  lazy val anonClient = new Client(s"http://localhost:$port")
-  lazy val identifiedClient = {
-    val user = MockUserClient.makeUser()
-    val token = "abcdefghijklmnopqrstuvwxyz"
-    MockUserClient.add(user, token = Some(token))
-    MockAuthorizationClient.grantAll(user.guid)
-    new Client(
-      s"http://localhost:$port",
-      Some(Authorization.Basic(token))
-    )
-  }
-
-  def createSubscription(
-    form: SubscriptionForm = createSubscriptionForm()
-  ): Subscription = {
-    await(anonClient.subscriptions.post(form))
-  }
-
-  def createSubscriptionForm(): SubscriptionForm = {
-    SubscriptionForm(
-      email = "test-user@" + UUID.randomUUID.toString + ".com",
-      publication = Publication.Launch
-    )
-  }
-
-  def expectErrors(f: => Unit): ErrorsResponse = {
-    Try(
-      f
-    ) match {
-      case Success(response) => {
-        sys.error("Expected function to fail but it succeeded with: " + response)
-      }
-      case Failure(ex) =>  ex match {
-        case e: ErrorsResponse => {
-          e
-        }
-        case e => {
-          sys.error(s"Expected an exception of type[ErrorsResponse] but got[$e]")
-        }
-      }
-    }
-  }
-
-  def expectStatus(code: Int, f: => Unit) {
-    assert(code >= 400, s"code[$code] must be >= 400")
-
-    Try(
-      f
-    ) match {
-      case Success(response) => {
-        org.specs2.execute.Failure(s"Expected HTTP[$code] but got HTTP 200")
-      }
-      case Failure(ex) => ex match {
-        case UnitResponse(code) => {
-          org.specs2.execute.Success()
-        }
-        case e => {
-          org.specs2.execute.Failure(s"Expected HTTP[$code] but got HTTP 200")
-        }
-      }
-    }
-  }
-
   "POST /subscriptions" in new WithServer(port=port) {
     val form = createSubscriptionForm()
-    val subscription = createSubscription(form)
+    val subscription = await(anonClient.subscriptions.post(form))
     subscription.email must beEqualTo(form.email)
     subscription.publication must beEqualTo(form.publication)
   }
 
   "POST /subscriptions validates empty email" in new WithServer(port=port) {
     expectErrors {
-      createSubscription(createSubscriptionForm().copy(email = "  "))
+      anonClient.subscriptions.post(createSubscriptionForm().copy(email = "  "))
     }.errors.map(_.message) must beEqualTo(Seq("Email address cannot be empty"))
   }
 
   "POST /subscriptions validates invalid email" in new WithServer(port=port) {
     expectErrors {
-      createSubscription(createSubscriptionForm().copy(email = "test"))
+      anonClient.subscriptions.post(createSubscriptionForm().copy(email = "test"))
     }.errors.map(_.message) must beEqualTo(Seq("Please enter a valid email address"))
   }
 
-  "POST /subscriptions validates duplicate email" in new WithServer(port=port) {
+  "POST /subscriptions is idempotent with duplicate email" in new WithServer(port=port) {
     val form = createSubscriptionForm()
     val sub = createSubscription(form)
 
-    createSubscription(form.copy(email = " " + form.email + " "))
-    createSubscription(form.copy(email = " " + form.email.toUpperCase + " "))
-    createSubscription(form.copy(email = form.email.toLowerCase))
+    anonClient.subscriptions.post(form.copy(email = " " + form.email + " "))
+    anonClient.subscriptions.post(form.copy(email = " " + form.email.toUpperCase + " "))
+    anonClient.subscriptions.post(form.copy(email = form.email.toLowerCase))
 
     await(
       identifiedClient.subscriptions.getByGuid(sub.guid)
@@ -115,7 +51,7 @@ class SubscriptionsSpec extends PlaySpecification {
     val form = createSubscriptionForm()
 
     expectErrors {
-      createSubscription(form.copy(publication = Publication.UNDEFINED("invalid_publication")))
+      anonClient.subscriptions.post(form.copy(publication = Publication.UNDEFINED("invalid_publication")))
     }.errors.map(_.message) must beEqualTo(Seq("Publication not found"))
   }
 
@@ -130,7 +66,7 @@ class SubscriptionsSpec extends PlaySpecification {
     )
 
     expectErrors {
-      createSubscription(form)
+      anonClient.subscriptions.post(form)
     }.errors.map(_.message) must beEqualTo(Seq("If specifying latitude, must also specify longitude"))
   }
 
@@ -142,10 +78,8 @@ class SubscriptionsSpec extends PlaySpecification {
   }
 
   "GET /subscriptions/:guid requires authorization" in new WithServer(port=port) {
-    expectStatus(401,
-      await(
-        anonClient.subscriptions.getByGuid(UUID.randomUUID)
-      )
+    expectNotAuthorized(
+      anonClient.subscriptions.getByGuid(UUID.randomUUID)
     )
 
     val otherClient = new Client(
@@ -153,18 +87,14 @@ class SubscriptionsSpec extends PlaySpecification {
       Some(Authorization.Basic(UUID.randomUUID.toString))
     )
 
-    expectStatus(401,
-      await(
-        anonClient.subscriptions.getByGuid(UUID.randomUUID)
-      )
+    expectNotAuthorized(
+      anonClient.subscriptions.getByGuid(UUID.randomUUID)
     )
   }
 
   "GET /subscriptions/:guid w/ invalid guid returns 404" in new WithServer(port=port) {
-    expectStatus(404,
-      await(
-        identifiedClient.subscriptions.getByGuid(UUID.randomUUID)
-      )
+    expectNotFound(
+      identifiedClient.subscriptions.getByGuid(UUID.randomUUID)
     )
   }
 
@@ -207,8 +137,8 @@ class SubscriptionsSpec extends PlaySpecification {
       )
     )
 
-    expectErrors {
-      createSubscription(form)
+   expectErrors {
+      anonClient.subscriptions.post(form)
     }.errors.map(_.message) must beEqualTo(Seq("If specifying longitude, must also specify latitude"))
   }
 
