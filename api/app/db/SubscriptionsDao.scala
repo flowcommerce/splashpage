@@ -18,9 +18,9 @@ object SubscriptionsDao {
     select subscriptions.guid,
            subscriptions.publication,
            subscriptions.email,
-           subscriptions.ip_address,
-           subscriptions.latitude,
-           subscriptions.longitude,
+           subscriptions.ip_address as subscriptions_geo_ip_address,
+           subscriptions.latitude as subscriptions_geo_latitude,
+           subscriptions.longitude as subscriptions_geo_longitude,
            ${AuditsDao.creationOnly("subscriptions")}
       from subscriptions
      where true

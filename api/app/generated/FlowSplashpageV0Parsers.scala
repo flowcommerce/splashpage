@@ -32,7 +32,7 @@ package io.flow.splashpage.v0.anorm.parsers {
   object Geo {
 
     case class Mappings(
-      ipAddress: String = "ipAddress",
+      ipAddress: String = "ip_address",
       latitude: String = "latitude",
       longitude: String = "longitude"
     )
@@ -59,6 +59,46 @@ package io.flow.splashpage.v0.anorm.parsers {
       SqlParser.str(mappings.longitude).? map {
         case ipAddress ~ latitude ~ longitude => {
           io.flow.splashpage.v0.models.Geo(
+            ipAddress = ipAddress,
+            latitude = latitude,
+            longitude = longitude
+          )
+        }
+      }
+    }
+
+  }
+
+  object GeoForm {
+
+    case class Mappings(
+      ipAddress: String = "ip_address",
+      latitude: String = "latitude",
+      longitude: String = "longitude"
+    )
+
+    object Mappings {
+
+      val base = prefix("", "")
+
+      def table(table: String) = prefix(table, ".")
+
+      def prefix(prefix: String, sep: String) = Mappings(
+        ipAddress = s"${prefix}${sep}ip_address",
+        latitude = s"${prefix}${sep}latitude",
+        longitude = s"${prefix}${sep}longitude"
+      )
+
+    }
+
+    def table(table: String) = parser(Mappings.prefix(table, "."))
+
+    def parser(mappings: Mappings): RowParser[io.flow.splashpage.v0.models.GeoForm] = {
+      SqlParser.str(mappings.ipAddress).? ~
+      SqlParser.str(mappings.latitude).? ~
+      SqlParser.str(mappings.longitude).? map {
+        case ipAddress ~ latitude ~ longitude => {
+          io.flow.splashpage.v0.models.GeoForm(
             ipAddress = ipAddress,
             latitude = latitude,
             longitude = longitude
@@ -101,7 +141,7 @@ package io.flow.splashpage.v0.anorm.parsers {
       SqlParser.get[_root_.java.util.UUID](mappings.guid) ~
       SqlParser.str(mappings.email) ~
       io.flow.splashpage.v0.anorm.parsers.Publication.parser(io.flow.splashpage.v0.anorm.parsers.Publication.Mappings(mappings.publication)) ~
-      io.flow.splashpage.v0.anorm.parsers.Geo.parser(mappings.geo).? ~
+      io.flow.splashpage.v0.anorm.parsers.Geo.parser(mappings.geo) ~
       io.flow.common.v0.anorm.parsers.Audit.parser(mappings.audit) map {
         case guid ~ email ~ publication ~ geo ~ audit => {
           io.flow.splashpage.v0.models.Subscription(
@@ -122,7 +162,7 @@ package io.flow.splashpage.v0.anorm.parsers {
     case class Mappings(
       email: String = "email",
       publication: String = "publication",
-      geo: io.flow.splashpage.v0.anorm.parsers.Geo.Mappings
+      geo: io.flow.splashpage.v0.anorm.parsers.GeoForm.Mappings
     )
 
     object Mappings {
@@ -134,7 +174,7 @@ package io.flow.splashpage.v0.anorm.parsers {
       def prefix(prefix: String, sep: String) = Mappings(
         email = s"${prefix}${sep}email",
         publication = s"${prefix}${sep}publication",
-        geo = io.flow.splashpage.v0.anorm.parsers.Geo.Mappings.prefix(Seq(prefix, "geo").filter(!_.isEmpty).mkString("_"), "_")
+        geo = io.flow.splashpage.v0.anorm.parsers.GeoForm.Mappings.prefix(Seq(prefix, "geo").filter(!_.isEmpty).mkString("_"), "_")
       )
 
     }
@@ -144,7 +184,7 @@ package io.flow.splashpage.v0.anorm.parsers {
     def parser(mappings: Mappings): RowParser[io.flow.splashpage.v0.models.SubscriptionForm] = {
       SqlParser.str(mappings.email) ~
       io.flow.splashpage.v0.anorm.parsers.Publication.parser(io.flow.splashpage.v0.anorm.parsers.Publication.Mappings(mappings.publication)) ~
-      io.flow.splashpage.v0.anorm.parsers.Geo.parser(mappings.geo).? map {
+      io.flow.splashpage.v0.anorm.parsers.GeoForm.parser(mappings.geo).? map {
         case email ~ publication ~ geo => {
           io.flow.splashpage.v0.models.SubscriptionForm(
             email = email,

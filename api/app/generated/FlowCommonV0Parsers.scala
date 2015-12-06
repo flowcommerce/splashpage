@@ -164,9 +164,9 @@ package io.flow.common.v0.anorm.parsers {
   object Audit {
 
     case class Mappings(
-      createdAt: String = "createdAt",
+      createdAt: String = "created_at",
       createdBy: io.flow.common.v0.anorm.parsers.Reference.Mappings,
-      updatedAt: String = "updatedAt",
+      updatedAt: String = "updated_at",
       updatedBy: io.flow.common.v0.anorm.parsers.Reference.Mappings
     )
 

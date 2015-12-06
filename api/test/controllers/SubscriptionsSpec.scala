@@ -2,7 +2,7 @@ package controllers
 
 import io.flow.splashpage.v0.{Authorization, Client}
 import io.flow.splashpage.v0.errors.{ErrorsResponse, UnitResponse}
-import io.flow.splashpage.v0.models.{Geo, Publication, Subscription, SubscriptionForm}
+import io.flow.splashpage.v0.models.{Geo, GeoForm, Publication, Subscription, SubscriptionForm}
 import io.flow.user.v0.models.User
 import io.flow.play.clients.{MockAuthorizationClient, MockUserClient}
 import java.util.UUID
@@ -122,7 +122,7 @@ class SubscriptionsSpec extends PlaySpecification {
   "POST /subscriptions validates longitude" in new WithServer(port=port) {
     val form = createSubscriptionForm().copy(
       geo = Some(
-        Geo(
+        GeoForm(
           latitude = Some("42.213"),
           longitude = None
         )
@@ -132,41 +132,6 @@ class SubscriptionsSpec extends PlaySpecification {
     expectErrors {
       createSubscription(form)
     }.errors.map(_.message) must beEqualTo(Seq("If specifying latitude, must also specify longitude"))
-  }
-
-  "POST /subscriptions validates latitude" in new WithServer(port=port) {
-    val form = createSubscriptionForm().copy(
-      geo = Some(
-        Geo(
-          latitude = None,
-          longitude = Some("42.213")
-        )
-      )
-    )
-
-    expectErrors {
-      createSubscription(form)
-    }.errors.map(_.message) must beEqualTo(Seq("If specifying longitude, must also specify latitude"))
-  }
-
-  "POST /subscriptions stores geo info" in new WithServer(port=port) {
-    val geo = Geo(
-      ipAddress = Some("127.0.0.1"),
-      latitude = Some("42.213"),
-      longitude = Some("12.213")
-    )
-
-    val sub = createSubscription(createSubscriptionForm().copy(geo = Some(geo)))
-    sub.geo must beEqualTo(Some(geo))
-  }
-
-  "POST /subscriptions geo info ignores empty string" in new WithServer(port=port) {
-    val geo = Geo(
-      ipAddress = Some("  ")
-    )
-
-    val sub = createSubscription(createSubscriptionForm().copy(geo = Some(geo)))
-    sub.geo must be(None)
   }
 
   "GET /subscriptions/:guid" in new WithServer(port=port) {
@@ -230,6 +195,47 @@ class SubscriptionsSpec extends PlaySpecification {
     await(
       identifiedClient.subscriptions.get(email = Some(sub.email), publication = Some(sub.publication))
     ) must beEqualTo(Seq(sub))
+  }
+
+ "POST /subscriptions validates latitude" in new WithServer(port=port) {
+    val form = createSubscriptionForm().copy(
+      geo = Some(
+        GeoForm(
+          latitude = None,
+          longitude = Some("42.213")
+        )
+      )
+    )
+
+    expectErrors {
+      createSubscription(form)
+    }.errors.map(_.message) must beEqualTo(Seq("If specifying longitude, must also specify latitude"))
+  }
+
+  "POST /subscriptions geo info ignores empty string" in new WithServer(port=port) {
+    val form = GeoForm(
+      ipAddress = Some("  ")
+    )
+
+    val sub = createSubscription(createSubscriptionForm().copy(geo = Some(form)))
+    sub.geo must beEqualTo(Geo())
+  }
+
+  "POST /subscriptions stores geo info" in new WithServer(port=port) {
+    val form = GeoForm(
+      ipAddress = Some("127.0.0.1"),
+      latitude = Some("42.213"),
+      longitude = Some("12.213")
+    )
+
+    val sub = createSubscription(createSubscriptionForm().copy(geo = Some(form)))
+    sub.geo must beEqualTo(
+      Geo(
+        ipAddress = form.ipAddress,
+        latitude = form.latitude,
+        longitude = form.longitude
+      )
+    )
   }
 
 }
