@@ -21,7 +21,7 @@ object SubscriptionsDao {
            subscriptions.ip_address,
            subscriptions.latitude,
            subscriptions.longitude,
-           ${AuditsDao.queryCreation("subscriptions")}
+           ${AuditsDao.creationOnly("subscriptions")}
       from subscriptions
      where true
   """
@@ -113,7 +113,7 @@ object SubscriptionsDao {
   }
 
   def softDelete(deletedBy: User, subscription: Subscription) {
-    SoftDelete.delete("subscriptions", deletedBy, subscription.guid)
+    SoftDelete.delete("subscriptions", deletedBy.guid, subscription.guid)
   }
 
   def findByGuid(guid: UUID): Option[Subscription] = {
@@ -144,34 +144,9 @@ object SubscriptionsDao {
     ).flatten
 
     DB.withConnection { implicit c =>
-      SQL(sql).on(bind: _*)().toList.map { fromRow(_) }.toSeq
-    }
-  }
-
-  private[db] def fromRow(
-    row: anorm.Row
-  ): Subscription = {
-    Subscription(
-      guid = row[UUID]("guid"),
-      email = row[String]("email"),
-      publication = Publication(row[String]("publication")),
-      geo = geoFromRow(row),
-      audit = AuditsDao.fromRowCreation(row)
-    )
-  }
-
-  private[db] def geoFromRow(
-    row: anorm.Row
-  ): Option[Geo] = {
-    val geo = Geo(
-      ipAddress = row[Option[String]]("ip_address"),
-      latitude = row[Option[String]]("latitude"),
-      longitude = row[Option[String]]("longitude")
-    )
-
-    geo match {
-      case Geo(None, None, None) => None
-      case _ => Some(geo)
+      SQL(sql).on(bind: _*).as(
+        io.flow.splashpage.v0.anorm.parsers.Subscription.table("subscriptions").*
+      )
     }
   }
 

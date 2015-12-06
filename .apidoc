@@ -4,6 +4,7 @@ code:
       version: latest
       generators:
         play_2_x_json: generated/app
+        anorm_2_x_parsers: api/app/generated
     user:
       version: latest
       generators:
@@ -13,3 +14,4 @@ code:
       generators:
         play_2_4_client: generated/app
         play_2_x_routes: api/conf/routes
+        anorm_2_x_parsers: api/app/generated
