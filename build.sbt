@@ -51,6 +51,11 @@ lazy val www = project
     )
   )
 
+val credsToUse = Option(System.getenv("ARTIFACTORY_USERNAME")) match {
+  case None => Credentials(Path.userHome / ".ivy2" / ".artifactory")
+  case _ => Credentials("Artifactory Realm","flow.artifactoryonline.com",System.getenv("ARTIFACTORY_USERNAME"),System.getenv("ARTIFACTORY_PASSWORD"))
+}
+
 lazy val commonSettings: Seq[Setting[_]] = Seq(
   name <<= name("splashpage-" + _),
   libraryDependencies ++= Seq(
@@ -60,5 +65,6 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
   scalacOptions += "-feature",
   coverageHighlighting := true,
   resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases",
-  credentials += Credentials(Path.userHome / ".ivy2" / ".artifactory")
+  resolvers += "Artifactory" at "https://flow.artifactoryonline.com/flow/libs-release/",
+  credentials += credsToUse
 )
