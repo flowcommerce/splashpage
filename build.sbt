@@ -60,5 +60,11 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
   scalacOptions += "-feature",
   coverageHighlighting := true,
   resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases",
-  credentials += Credentials(Path.userHome / ".ivy2" / ".artifactory")
+  resolvers += "Artifactory" at "https://flow.artifactoryonline.com/flow/libs-release/",
+  credentials += Credentials(
+    "Artifactory Realm",
+    "flow.artifactoryonline.com",
+    System.getenv("ARTIFACTORY_USERNAME"),
+    System.getenv("ARTIFACTORY_PASSWORD")
+  )
 )
