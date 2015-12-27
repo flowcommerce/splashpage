@@ -30,7 +30,7 @@ lazy val api = project
     routesGenerator := InjectedRoutesGenerator,
     libraryDependencies ++= Seq(
       "io.flow" %% "lib-play" % "0.0.9",
-      "io.flow" %% "lib-play-postgresql" % "0.0.11",
+      "io.flow" %% "lib-play-postgresql" % "0.0.12",
       "org.postgresql" % "postgresql" % "9.4-1206-jdbc42"
     )
   )
