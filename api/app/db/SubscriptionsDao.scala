@@ -4,7 +4,7 @@ import io.flow.common.v0.models.Error
 import io.flow.user.v0.models.User
 import io.flow.splashpage.v0.models.{Geo, Publication, Subscription, SubscriptionForm}
 import io.flow.play.clients.UserClient
-import io.flow.play.postgresql.{AuditsDao, Filters, SoftDelete}
+import io.flow.play.postgresql.{AuditsDao, Query, OrderBy, SoftDelete}
 import io.flow.play.util.Validation
 import anorm._
 import play.api.db._
@@ -14,7 +14,7 @@ import java.util.UUID
 
 object SubscriptionsDao {
 
-  private[this] val BaseQuery = s"""
+  private[this] val BaseQuery = Query(s"""
     select subscriptions.guid,
            subscriptions.publication,
            subscriptions.email,
@@ -23,8 +23,7 @@ object SubscriptionsDao {
            subscriptions.longitude as subscriptions_geo_longitude,
            ${AuditsDao.creationOnly("subscriptions")}
       from subscriptions
-     where true
-  """
+  """)
 
   private[this] val InsertQuery = """
     insert into subscriptions
@@ -125,28 +124,27 @@ object SubscriptionsDao {
     email: Option[String] = None,
     publication: Option[Publication] = None,
     isDeleted: Option[Boolean] = Some(false),
+    orderBy: OrderBy = OrderBy("created_at", Some("subscriptions")),
     limit: Long = 25,
     offset: Long = 0
   ): Seq[Subscription] = {
-    val sql = Seq(
-      Some(BaseQuery.trim),
-      guid.map { v => "and subscriptions.guid = {guid}::uuid" },
-      email.map { v => "and lower(subscriptions.email) = lower(trim({email}))" },
-      publication.map { v => "and subscriptions.publication = {publication}" },
-      isDeleted.map(Filters.isDeleted("subscriptions", _)),
-      Some(s"order by subscriptions.created_at limit ${limit} offset ${offset}")
-    ).flatten.mkString("\n   ")
-
-    val bind = Seq[Option[NamedParameter]](
-      guid.map('guid -> _.toString),
-      email.map('email -> _.toString),
-      publication.map('publication -> _.toString)
-    ).flatten
-
     DB.withConnection { implicit c =>
-      SQL(sql).on(bind: _*).as(
-        io.flow.splashpage.v0.anorm.parsers.Subscription.table("subscriptions").*
-      )
+      BaseQuery.
+        uuid("subscriptions.guid", guid).
+        text(
+          "subscriptions.email",
+          email,
+          columnFunctions = Seq(Query.Function.Lower),
+          valueFunctions = Seq(Query.Function.Lower, Query.Function.Trim)
+        ).
+        text("subscriptions.publication", publication).
+        nullBoolean(s"subscriptions.deleted_at", isDeleted).
+        orderBy(orderBy.sql).
+        limit(Some(limit)).
+        offset(Some(offset)).
+        as(
+          io.flow.splashpage.v0.anorm.parsers.Subscription.table("subscriptions").*
+        )
     }
   }
 
