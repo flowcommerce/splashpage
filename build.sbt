@@ -35,22 +35,6 @@ lazy val api = project
     )
   )
 
-lazy val www = project
-  .in(file("www"))
-  .dependsOn(generated)
-  .aggregate(generated)
-  .enablePlugins(PlayScala)
-  .settings(commonSettings: _*)
-  .settings(
-    routesImport += "io.flow.splashpage.v0.Bindables._",
-    routesGenerator := InjectedRoutesGenerator,
-    libraryDependencies ++= Seq(
-      "org.webjars" %% "webjars-play" % "2.4.0",
-      "org.webjars" % "bootstrap" % "3.3.6",
-      "org.webjars" % "jquery" % "2.1.4"
-    )
-  )
-
 lazy val commonSettings: Seq[Setting[_]] = Seq(
   name <<= name("splashpage-" + _),
   libraryDependencies ++= Seq(
