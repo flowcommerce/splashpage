@@ -3,7 +3,7 @@
     "base_url": "http://api.flow.io",
 
     "imports": [
-	{ "uri": "http://www.apidoc.me/flow/common/0.0.1-dev/service.json" }
+	{ "uri": "http://www.apidoc.me/flow/common/0.0.3-dev/service.json" }
     ],
 
     "enums": {
@@ -20,11 +20,10 @@
 	"subscription": {
 	    "description": "Represents an email address that is currently subscribed to a publication",
 	    "fields": [
-		{ "name": "guid", "type": "uuid", "description": "Internal unique identifier for this subscription" },
+		{ "name": "id", "type": "string", "description": "Internal unique identifier for this subscription" },
 		{ "name": "email", "type": "string", "description": "Case insensitive email address to which to send notifications for this subscription" },
 		{ "name": "publication", "type": "publication" },
-		{ "name": "geo", "type": "geo" },
-                { "name": "audit", "type": "io.flow.common.v0.models.audit" }
+		{ "name": "geo", "type": "geo" }
 	    ]
 	},
 
@@ -74,11 +73,12 @@
                     "method": "GET",
                     "description": "Search subscriptions. Always paginated.",
                     "parameters": [
-                        { "name": "guid", "type": "uuid", "description": "Find the subscription with this guid.", "required": false },
+                        { "name": "id", "type": "[string]", "description": "Find the subscription with any one of these ids.", "required": false },
                         { "name": "email", "type": "string", "description": "Find subscriptions for this email. Case insensitive.", "required": false },
                         { "name": "publication", "type": "publication", "description": "Find subscriptions for this publication.", "required": false },
                         { "name": "limit", "type": "long", "default": 25, "description": "The number of records to return", "minimum": 0, "maximum": 100 },
-                        { "name": "offset", "type": "long", "default": 0, "description": "Used to paginate. First page of results is 0.", "minimum": 0 }
+                        { "name": "offset", "type": "long", "default": 0, "description": "Used to paginate. First page of results is 0.", "minimum": 0 },
+			{ "name": "sort", "type": "string", "description": "Information on how to sort the result set", "default": "created_at" }
                     ],
                     "responses": {
                         "200": { "type": "[subscription]" },
@@ -89,7 +89,7 @@
                 {
                     "method": "GET",
                     "description": "Returns information about a specific subscription.",
-                    "path": "/:guid",
+                    "path": "/:id",
                     "responses": {
                         "200": { "type": "subscription" },
                         "401": { "type": "unit" },
@@ -104,16 +104,17 @@
                     "responses": {
                         "200": { "type": "subscription", "description": "Indicates that request was successful, but email address was already subscribed. We return the original subscription record" },
                         "201": { "type": "subscription", "description": "A new subscription has been created" },
-                        "409": { "type": "[io.flow.common.v0.models.error]" }
+                        "422": { "type": "[io.flow.common.v0.models.error]" }
                     }
                 },
 
                 {
                     "method": "DELETE",
-		    "path": "/:guid",
+		    "path": "/:id",
 		    "responses": {
 			"204": { "type": "unit" },
-			"401": { "type": "unit" }
+			"401": { "type": "unit" },
+			"404": { "type": "unit" }
 		    }
                 }
             ]

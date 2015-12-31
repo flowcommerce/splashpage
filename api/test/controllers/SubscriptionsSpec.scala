@@ -43,7 +43,7 @@ class SubscriptionsSpec extends PlaySpecification with MockClient {
     anonClient.subscriptions.post(form.copy(email = form.email.toLowerCase))
 
     await(
-      identifiedClient.subscriptions.getByGuid(sub.guid)
+      identifiedClient.subscriptions.getById(sub.id)
     ).email must beEqualTo(form.email)
   }
 
@@ -70,42 +70,42 @@ class SubscriptionsSpec extends PlaySpecification with MockClient {
     }.errors.map(_.message) must beEqualTo(Seq("If specifying latitude, must also specify longitude"))
   }
 
-  "GET /subscriptions/:guid" in new WithServer(port=port) {
+  "GET /subscriptions/:id" in new WithServer(port=port) {
     val sub = createSubscription()
     await(
-      identifiedClient.subscriptions.getByGuid(sub.guid)
+      identifiedClient.subscriptions.getById(sub.id)
     ) must beEqualTo(sub)
   }
 
-  "GET /subscriptions/:guid requires authorization" in new WithServer(port=port) {
+  "GET /subscriptions/:id requires authorization" in new WithServer(port=port) {
     expectNotAuthorized(
-      anonClient.subscriptions.getByGuid(UUID.randomUUID)
+      anonClient.subscriptions.getById(UUID.randomUUID.toString)
     )
 
     val otherClient = new Client(
       s"http://localhost:$port",
-      Some(Authorization.Basic(UUID.randomUUID.toString))
+      Some(Authorization.Basic(UUID.randomUUID.toString.toString))
     )
 
     expectNotAuthorized(
-      anonClient.subscriptions.getByGuid(UUID.randomUUID)
+      anonClient.subscriptions.getById(UUID.randomUUID.toString)
     )
   }
 
-  "GET /subscriptions/:guid w/ invalid guid returns 404" in new WithServer(port=port) {
+  "GET /subscriptions/:id w/ invalid id returns 404" in new WithServer(port=port) {
     expectNotFound(
-      identifiedClient.subscriptions.getByGuid(UUID.randomUUID)
+      identifiedClient.subscriptions.getById(UUID.randomUUID.toString)
     )
   }
 
-  "GET /subscriptions by guid" in new WithServer(port=port) {
+  "GET /subscriptions by id" in new WithServer(port=port) {
     val sub = createSubscription()
     await(
-      identifiedClient.subscriptions.get(guid = Some(sub.guid))
+      identifiedClient.subscriptions.get(id = Some(Seq(sub.id)))
     ) must beEqualTo(Seq(sub))
 
     await(
-        identifiedClient.subscriptions.get(guid = Some(UUID.randomUUID))
+        identifiedClient.subscriptions.get(id = Some(Seq(UUID.randomUUID.toString)))
     ) must beEqualTo(Nil)
   }
 
@@ -116,7 +116,7 @@ class SubscriptionsSpec extends PlaySpecification with MockClient {
     ) must beEqualTo(Seq(sub))
 
     await(
-      identifiedClient.subscriptions.get(email = Some(UUID.randomUUID + "@flow.io"))
+      identifiedClient.subscriptions.get(email = Some(UUID.randomUUID.toString + "@flow.io"))
     ) must beEqualTo(Nil)
   }
 

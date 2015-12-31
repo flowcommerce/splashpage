@@ -6,12 +6,19 @@ import java.util.UUID
 
 trait Helpers {
 
-  private val user = MockUserClient.makeUser().copy(guid = UserClient.AnonymousUserGuid)
+  private val user = MockUserClient.makeUser()
+
+  def rightOrErrors[T](result: Either[Seq[String], T]): T = {
+    result match {
+      case Left(errors) => sys.error(errors.mkString(", "))
+      case Right(obj) => obj
+    }
+  }
 
   def createSubscription(
     form: SubscriptionForm = createSubscriptionForm()
   ): Subscription = {
-    SubscriptionsDao.create(Some(user), form)
+    rightOrErrors(SubscriptionsDao.create(Some(user), form))
   }
 
   def createSubscriptionForm(): SubscriptionForm = {

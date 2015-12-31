@@ -1,35 +1,38 @@
 package db
 
-import io.flow.common.v0.models.Error
 import io.flow.user.v0.models.User
 import io.flow.splashpage.v0.models.{Geo, Publication, Subscription, SubscriptionForm}
+import io.flow.postgresql.{Query, OrderBy}
 import io.flow.play.clients.UserClient
-import io.flow.play.postgresql.{AuditsDao, Query, OrderBy, SoftDelete}
-import io.flow.play.util.Validation
+import io.flow.play.util.IdGenerator
 import anorm._
 import play.api.db._
 import play.api.Play.current
 import play.api.libs.json._
-import java.util.UUID
 
 object SubscriptionsDao {
 
+  private[this] val idGenerator = IdGenerator("sub")
+
   private[this] val BaseQuery = Query(s"""
-    select subscriptions.guid,
+    select subscriptions.id,
            subscriptions.publication,
            subscriptions.email,
            subscriptions.ip_address as subscriptions_geo_ip_address,
            subscriptions.latitude as subscriptions_geo_latitude,
-           subscriptions.longitude as subscriptions_geo_longitude,
-           ${AuditsDao.creationOnly("subscriptions")}
+           subscriptions.longitude as subscriptions_geo_longitude
       from subscriptions
   """)
 
   private[this] val InsertQuery = """
     insert into subscriptions
-    (guid, email, publication, ip_address, latitude, longitude, created_by_guid)
+    (id, email, publication, ip_address, latitude, longitude, updated_by_user_id)
     values
-    ({guid}::uuid, {email}, {publication}, {ip_address}, {latitude}, {longitude}, {created_by_guid}::uuid)
+    ({id}, {email}, {publication}, {ip_address}, {latitude}, {longitude}, {updated_by_user_id})
+  """
+
+  private[this] val SoftDeleteQuery = """
+    update subscriptions set deleted_at=now(), updated_by_user_id = {updated_by_user_id} where id = {id}
   """
 
   private def stringToTrimmedOption(value: String): Option[String] = {
@@ -39,9 +42,9 @@ object SubscriptionsDao {
     }
   }
 
-  def validate(
+  private[this] def validate(
     form: SubscriptionForm
-  ): Seq[Error] = {
+  ): Seq[String] = {
     val publicationErrors = form.publication match {
       case Publication.UNDEFINED(_) => Seq("Publication not found")
       case _ => Seq.empty
@@ -81,46 +84,57 @@ object SubscriptionsDao {
       }
     }
 
-    Validation.errors(publicationErrors ++ emailErrors ++ geoErrors)
+    publicationErrors ++ emailErrors ++ geoErrors
   }
 
   private def isValidEmail(email: String): Boolean = {
     email.indexOf("@") >= 0
   }
 
-  def create(createdBy: Option[User], form: SubscriptionForm): Subscription = {
-    val errors = validate(form)
-    assert(errors.isEmpty, errors.map(_.message).mkString("\n"))
+  def create(createdBy: Option[User], form: SubscriptionForm): Either[Seq[String], Subscription] = {
+    validate(form) match {
+      case Nil => {
+        val id = idGenerator.randomId
 
-    val guid = UUID.randomUUID
-
-    DB.withConnection { implicit c =>
-      SQL(InsertQuery).on(
-        'guid -> guid,
-        'publication -> form.publication.toString,
-        'email -> form.email.trim,
-        'ip_address -> form.geo.flatMap(_.ipAddress).flatMap(stringToTrimmedOption(_)),
-        'latitude -> form.geo.flatMap(_.latitude).flatMap(stringToTrimmedOption(_)),
-        'longitude -> form.geo.flatMap(_.longitude).flatMap(stringToTrimmedOption(_)),
-        'created_by_guid -> createdBy.map(_.guid).getOrElse(UserClient.AnonymousUserGuid)
-      ).execute()
-    }
-
-    findByGuid(guid).getOrElse {
-      sys.error("Failed to create subscription")
+        DB.withConnection { implicit c =>
+          SQL(InsertQuery).on(
+            'id -> id,
+            'publication -> form.publication.toString,
+            'email -> form.email.trim,
+            'ip_address -> form.geo.flatMap(_.ipAddress).flatMap(stringToTrimmedOption(_)),
+            'latitude -> form.geo.flatMap(_.latitude).flatMap(stringToTrimmedOption(_)),
+            'longitude -> form.geo.flatMap(_.longitude).flatMap(stringToTrimmedOption(_)),
+            'updated_by_user_id -> createdBy.map(_.id).getOrElse(id)
+          ).execute()
+        }
+  
+        Right(
+          findById(id).getOrElse {
+            sys.error("Failed to create subscription")
+          }
+        )
+      }
+      case errors => {
+        Left(errors)
+      }
     }
   }
 
   def softDelete(deletedBy: User, subscription: Subscription) {
-    SoftDelete.delete("subscriptions", deletedBy.guid, subscription.guid)
+    DB.withConnection { implicit c =>
+      SQL(SoftDeleteQuery).on(
+        'id -> subscription.id,
+        'updated_by_user_id -> deletedBy.id
+      ).execute()
+    }
   }
 
-  def findByGuid(guid: UUID): Option[Subscription] = {
-    findAll(guid = Some(guid), limit = 1).headOption
+  def findById(id: String): Option[Subscription] = {
+    findAll(ids = Some(Seq(id)), limit = 1).headOption
   }
 
   def findAll(
-    guid: Option[UUID] = None,
+    ids: Option[Seq[String]] = None,
     email: Option[String] = None,
     publication: Option[Publication] = None,
     isDeleted: Option[Boolean] = Some(false),
@@ -130,7 +144,7 @@ object SubscriptionsDao {
   ): Seq[Subscription] = {
     DB.withConnection { implicit c =>
       BaseQuery.
-        uuid("subscriptions.guid", guid).
+        in("subscriptions.id", ids).
         text(
           "subscriptions.email",
           email,

@@ -23,7 +23,7 @@ trait MockClient extends db.Helpers {
     val user = MockUserClient.makeUser()
     val token = "abcdefghijklmnopqrstuvwxyz"
     MockUserClient.add(user, token = Some(token))
-    MockAuthorizationClient.grantAll(user.guid)
+    MockAuthorizationClient.grantAll(user.id.toString)
     new Client(
       s"http://localhost:$port",
       Some(Authorization.Basic(token))

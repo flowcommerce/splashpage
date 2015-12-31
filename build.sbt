@@ -29,9 +29,11 @@ lazy val api = project
     routesImport += "io.flow.splashpage.v0.Bindables._",
     routesGenerator := InjectedRoutesGenerator,
     libraryDependencies ++= Seq(
-      "io.flow" %% "lib-play" % "0.0.12",
-      "io.flow" %% "lib-play-postgresql" % "0.0.13",
-      "org.postgresql" % "postgresql" % "9.4-1206-jdbc42"
+      jdbc,
+      "io.flow" %% "lib-play" % "0.0.14",
+      "io.flow" %% "lib-postgresql" % "0.0.16",
+      "org.postgresql" % "postgresql" % "9.4.1207",
+      "com.typesafe.play" %% "anorm" % "2.5.0"
     )
   )
 
