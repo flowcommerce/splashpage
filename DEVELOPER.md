@@ -19,11 +19,11 @@ apidoc. To regenerate code, clone github.com/gilt/apidoc-cli and
 Database
 ========
 
-    psql -c "create role api login createdb" postgres
-    psql -U api -c "CREATE DATABASE splashpage" postgres
+    psql -h <host> -u root -c "create role api login password 'xxx'" splashpage
+    psql -h <host> -u root -c "GRANT ALL ON DATABASE splashpage TO api" splashpage
 
-Database
-========
+Running locally
+===============
 
 In one screen:
 
