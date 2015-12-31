@@ -1,24 +1,32 @@
-insert into users
-  (guid, created_by_guid, updated_by_guid)
-  values
-  ('87ad4718-3104-4808-8731-0a6e448899cb', '87ad4718-3104-4808-8731-0a6e448899cb', '87ad4718-3104-4808-8731-0a6e448899cb');
+create or replace function make_user(
+  email text,
+  start_date text,
+  num integer
+) returns text language plpgsql as $$
+declare
+  v_otto_id text;
+  v_user_id text;
+begin
+  v_otto_id = 'usr-' || start_date || '-1';
 
-insert into emails
-  (guid, user_guid, email, created_by_guid, updated_by_guid)
+  v_user_id = 'usr-' || start_date || '-' || num;
+  insert into users (id, updated_by_user_id) values (v_user_id, v_otto_id);
+
+  insert into emails
+  (id, user_id, email, is_primary, updated_by_user_id)
   values
-  ('4a1a4722-7e34-4bda-aecb-7f8520932b42', '87ad4718-3104-4808-8731-0a6e448899cb', 'otto@flow.io', '87ad4718-3104-4808-8731-0a6e448899cb', '87ad4718-3104-4808-8731-0a6e448899cb');
+  ('eml-' || start_date || '-' || num, v_user_id, email, true, v_otto_id);
+
+  return v_user_id || ': ' || email;
+end;
+$$;
+
+select make_user('otto@flow.io', '20151006', 1);
+select make_user('anonymous@flow.io', '20151006', 2);
+
+drop function make_user(text, text, integer);
 
 insert into tokens
-  (guid, user_guid, token, description, created_by_guid, updated_by_guid)
-  values
-  ('f56f39ca-c91d-4641-891f-db2202973fab', '87ad4718-3104-4808-8731-0a6e448899cb', 'development', 'Initial API token created for system user', '87ad4718-3104-4808-8731-0a6e448899cb', '87ad4718-3104-4808-8731-0a6e448899cb');
-
-insert into users
-  (guid, created_by_guid, updated_by_guid)
-  values
-  ('f2374f80-3a59-4194-aed2-ef228e6171e3', '87ad4718-3104-4808-8731-0a6e448899cb', '87ad4718-3104-4808-8731-0a6e448899cb');
-
-insert into emails
-  (guid, user_guid, email, created_by_guid, updated_by_guid)
-  values
-  ('3830b38c-19b3-4d19-895d-b82caa61e850', 'f2374f80-3a59-4194-aed2-ef228e6171e3', 'anonymous@flow.io', '87ad4718-3104-4808-8731-0a6e448899cb', '87ad4718-3104-4808-8731-0a6e448899cb');
+(id, user_id, token, description, updated_by_user_id)
+values
+('tok-20151018-1', 'usr-20151006-1', 'development', 'Initial API token created for system user', 'usr-20151006-1');

@@ -1,13 +1,18 @@
 drop table if exists subscriptions;
 
 create table subscriptions (
-  guid                    uuid primary key,
-  publication             text not null check (enum(publication)),
-  email                   text not null check (trim(email) = email) check (email != '')
+  id                      text primary key,
+  publication             text not null check (util.lower_non_empty_trimmed_string(publication)),
+  email                   text not null check (util.non_empty_trimmed_string(email)),
+  ip_address              text check(util.null_or_non_empty_trimmed_string(ip_address)),
+  latitude                text check(util.null_or_non_empty_trimmed_string(latitude)),
+  longitude               text check(util.null_or_non_empty_trimmed_string(longitude)),
+  constraint subscriptions_latitude_longitude_ck check
+    ( (latitude is null and longitude is null)
+      OR (latitude is not null and longitude is not null) )
 );
 
-select schema_evolution_manager.create_basic_audit_data('public', 'subscriptions');
-alter table subscriptions drop column updated_by_guid; -- no updates
+select audit.setup('public', 'subscriptions');
 create unique index subscriptions_lower_email_un_idx on subscriptions(lower(email)) where deleted_at is null;
 
 comment on table subscriptions is '
