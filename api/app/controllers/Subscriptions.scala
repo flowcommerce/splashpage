@@ -25,6 +25,8 @@ class Subscriptions @javax.inject.Inject() () extends Controller with FlowContro
     offset: Long = 0,
     sort: String
   ) = Action { request =>
+    sys.error("not yet available pending authorization")
+
     OrderBy.parse(sort, Some("subscriptions")) match {
       case Left(errors) => {
         UnprocessableEntity(Json.toJson(Validation.invalidSort(errors)))
@@ -47,6 +49,8 @@ class Subscriptions @javax.inject.Inject() () extends Controller with FlowContro
   }
 
   def getById(id: String) = Action { request =>
+    sys.error("not yet available pending authorization")
+
     SubscriptionsDao.findById(id) match {
       case None => {
         NotFound
