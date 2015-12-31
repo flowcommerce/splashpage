@@ -104,7 +104,7 @@ object SubscriptionsDao {
             'ip_address -> form.geo.flatMap(_.ipAddress).flatMap(stringToTrimmedOption(_)),
             'latitude -> form.geo.flatMap(_.latitude).flatMap(stringToTrimmedOption(_)),
             'longitude -> form.geo.flatMap(_.longitude).flatMap(stringToTrimmedOption(_)),
-            'updated_by_user_id -> createdBy.map(_.id).getOrElse(id)
+            'updated_by_user_id -> createdBy.map(_.id).getOrElse(UserClient.AnonymousUserId)
           ).execute()
         }
   
