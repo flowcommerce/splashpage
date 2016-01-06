@@ -41,7 +41,7 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
   name <<= name("splashpage-" + _),
   libraryDependencies ++= Seq(
     specs2 % Test,
-    "org.scalatest" %% "scalatest" % "2.2.5" % Test
+    "org.scalatest" %% "scalatest" % "2.2.6" % Test
   ),
   scalacOptions += "-feature",
   coverageHighlighting := true,
