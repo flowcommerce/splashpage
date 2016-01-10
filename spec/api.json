@@ -3,7 +3,7 @@
     "base_url": "http://api.flow.io",
 
     "imports": [
-	{ "uri": "http://www.apidoc.me/flow/common/0.0.3-dev/service.json" }
+	{ "uri": "http://www.apidoc.me/flow/common/0.0.5-dev/service.json" }
     ],
 
     "enums": {
@@ -73,10 +73,10 @@
                     "method": "GET",
                     "description": "Search subscriptions. Always paginated.",
                     "parameters": [
-                        { "name": "id", "type": "[string]", "description": "Find the subscription with any one of these ids.", "required": false },
+                        { "name": "id", "type": "[string]", "description": "Find the subscription with any one of these ids.", "required": false, "maximum": 100 },
                         { "name": "email", "type": "string", "description": "Find subscriptions for this email. Case insensitive.", "required": false },
                         { "name": "publication", "type": "publication", "description": "Find subscriptions for this publication.", "required": false },
-                        { "name": "limit", "type": "long", "default": 25, "description": "The number of records to return", "minimum": 0, "maximum": 100 },
+                        { "name": "limit", "type": "long", "default": 25, "description": "The number of records to return", "minimum": 1, "maximum": 100 },
                         { "name": "offset", "type": "long", "default": 0, "description": "Used to paginate. First page of results is 0.", "minimum": 0 },
 			{ "name": "sort", "type": "string", "description": "Information on how to sort the result set", "default": "created_at" }
                     ],

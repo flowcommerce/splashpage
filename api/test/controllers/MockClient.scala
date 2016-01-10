@@ -1,10 +1,9 @@
 package controllers
 
-
+import io.flow.common.v0.models.User
 import io.flow.splashpage.v0.{Authorization, Client}
 import io.flow.splashpage.v0.errors.{ErrorsResponse, UnitResponse}
 import io.flow.splashpage.v0.models.{Geo, GeoForm, Publication, Subscription, SubscriptionForm}
-import io.flow.user.v0.models.User
 import io.flow.play.clients.{MockAuthorizationClient, MockUserClient}
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration

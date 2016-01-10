@@ -1,6 +1,6 @@
 package db
 
-import io.flow.user.v0.models.User
+import io.flow.common.v0.models.User
 import io.flow.splashpage.v0.models.{Geo, Publication, Subscription, SubscriptionForm}
 import io.flow.postgresql.{Query, OrderBy}
 import io.flow.play.clients.UserClient
