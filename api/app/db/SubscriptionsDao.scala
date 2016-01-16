@@ -18,9 +18,9 @@ object SubscriptionsDao {
     select subscriptions.id,
            subscriptions.publication,
            subscriptions.email,
-           subscriptions.ip_address as subscriptions_geo_ip_address,
-           subscriptions.latitude as subscriptions_geo_latitude,
-           subscriptions.longitude as subscriptions_geo_longitude
+           subscriptions.ip_address as geo_ip_address,
+           subscriptions.latitude as geo_latitude,
+           subscriptions.longitude as geo_longitude
       from subscriptions
   """)
 
