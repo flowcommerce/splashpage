@@ -157,7 +157,7 @@ object SubscriptionsDao {
         limit(Some(limit)).
         offset(Some(offset)).
         as(
-          io.flow.splashpage.v0.anorm.parsers.Subscription.table("subscriptions").*
+          io.flow.splashpage.v0.anorm.parsers.Subscription.parser().*
         )
     }
   }
