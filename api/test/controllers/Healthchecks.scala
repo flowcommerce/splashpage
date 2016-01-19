@@ -15,7 +15,7 @@ class HealthchecksSpec extends PlaySpecification {
 
   "GET /_internal_/healthcheck" in new WithServer(port=port) {
     await(
-      client.healthchecks.getInternalAndHealthcheck()
+      client.healthchecks.getHealthcheck()
     ) must beEqualTo(
       io.flow.common.v0.models.Healthcheck("healthy")
     )
