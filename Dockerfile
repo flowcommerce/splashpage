@@ -1,12 +1,9 @@
-FROM giltarchitecture/ubuntu-jvm:0.6
+FROM fbe979e12570
 
-MAINTAINER mbryzek@alum.mit.edu
+ADD . /opt/play
 
-ADD . /usr/share/splashpage
-
-WORKDIR /usr/share/splashpage
+WORKDIR /opt/play
 
 RUN sbt -Dsbt.ivy.home=.ivy2 clean stage
 
-RUN ln -s /usr/share/splashpage/api/target/universal/stage /usr/share/splashpage-api
-RUN ln -s /usr/share/splashpage/www/target/universal/stage /usr/share/splashpage-www
+CMD nohup /opt/play/api/target/universal/stage/bin/splashpage-api
