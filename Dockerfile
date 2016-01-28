@@ -1,4 +1,4 @@
-FROM fbe979e12570
+FROM giltarchitecture/ubuntu-jvm:0.6
 
 ADD . /opt/play
 
