@@ -31,9 +31,7 @@ object SubscriptionsDao {
     ({id}, {email}, {publication}, {ip_address}, {latitude}, {longitude}, {updated_by_user_id})
   """
 
-  private[this] val SoftDeleteQuery = """
-    update subscriptions set deleted_at=now(), updated_by_user_id = {updated_by_user_id} where id = {id}
-  """
+  private[this] val dbHelpers = DbHelpers("subscriptions")
 
   private def stringToTrimmedOption(value: String): Option[String] = {
     value.trim match {
@@ -123,12 +121,7 @@ object SubscriptionsDao {
   }
 
   def softDelete(deletedBy: User, subscription: Subscription) {
-    DB.withConnection { implicit c =>
-      SQL(SoftDeleteQuery).on(
-        'id -> subscription.id,
-        'updated_by_user_id -> deletedBy.id
-      ).execute()
-    }
+    dbHelpers.delete(deletedBy, subscription.id)
   }
 
   def findById(id: String): Option[Subscription] = {
@@ -139,7 +132,6 @@ object SubscriptionsDao {
     ids: Option[Seq[String]] = None,
     email: Option[String] = None,
     publication: Option[Publication] = None,
-    isDeleted: Option[Boolean] = Some(false),
     orderBy: OrderBy = OrderBy("created_at", Some("subscriptions")),
     limit: Long = 25,
     offset: Long = 0
@@ -154,7 +146,6 @@ object SubscriptionsDao {
           valueFunctions = Seq(Query.Function.Lower, Query.Function.Trim)
         ).
         optionalText("subscriptions.publication", publication).
-        nullBoolean(s"subscriptions.deleted_at", isDeleted).
         orderBy(orderBy.sql).
         limit(limit).
         offset(offset).

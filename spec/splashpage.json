@@ -20,7 +20,7 @@
 	"subscription": {
 	    "description": "Represents an email address that is currently subscribed to a publication",
 	    "fields": [
-		{ "name": "id", "type": "string", "description": "Internal unique identifier for this subscription" },
+		{ "name": "id", "type": "string" },
 		{ "name": "email", "type": "string", "description": "Case insensitive email address to which to send notifications for this subscription" },
 		{ "name": "publication", "type": "publication" },
 		{ "name": "geo", "type": "geo" }
@@ -73,12 +73,12 @@
                     "method": "GET",
                     "description": "Search subscriptions. Always paginated.",
                     "parameters": [
-                        { "name": "id", "type": "[string]", "description": "Find the subscription with any one of these ids.", "required": false, "maximum": 100 },
+                        { "name": "id", "type": "[string]", "required": false, "maximum": 100 },
                         { "name": "email", "type": "string", "description": "Find subscriptions for this email. Case insensitive.", "required": false },
                         { "name": "publication", "type": "publication", "description": "Find subscriptions for this publication.", "required": false },
-                        { "name": "limit", "type": "long", "default": 25, "description": "The number of records to return", "minimum": 1, "maximum": 100 },
-                        { "name": "offset", "type": "long", "default": 0, "description": "Used to paginate. First page of results is 0.", "minimum": 0 },
-			{ "name": "sort", "type": "string", "description": "Information on how to sort the result set", "default": "created_at" }
+                        { "name": "limit", "type": "long", "default": 25, "minimum": 1, "maximum": 100 },
+                        { "name": "offset", "type": "long", "default": 0, "minimum": 0 },
+			{ "name": "sort", "type": "string", "default": "-created_at" }
                     ],
                     "responses": {
                         "200": { "type": "[subscription]" },
@@ -103,7 +103,7 @@
                     "body": { "type": "subscription_form" },
                     "responses": {
                         "200": { "type": "subscription", "description": "Indicates that request was successful, but email address was already subscribed. We return the original subscription record" },
-                        "201": { "type": "subscription", "description": "A new subscription has been created" },
+                        "201": { "type": "subscription" },
                         "422": { "type": "[io.flow.common.v0.models.error]" }
                     }
                 },
