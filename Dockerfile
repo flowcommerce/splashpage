@@ -6,4 +6,4 @@ WORKDIR /opt/play
 
 RUN sbt clean stage
   
-ENTRYPOINT ["java", "-jar", "/root/environment-provider.jar", "play", "splashpage", "api/target/universal/stage/bin/splashpage-api"]
+ENTRYPOINT ["java", "-jar", "/root/environment-provider.jar", "run", "play", "splashpage", "api/target/universal/stage/bin/splashpage-api"]
