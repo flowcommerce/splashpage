@@ -1,4 +1,4 @@
-FROM flowcommerce/play:0.0.5-dev
+FROM flowcommerce/play:0.0.6
 
 ADD . /opt/play
 
