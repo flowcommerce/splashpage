@@ -13,6 +13,7 @@ parallelExecution in Test in ThisBuild := true
 lazy val generated = project
   .in(file("generated"))
   .enablePlugins(PlayScala)
+  .settings(commonSettings: _*)
   .settings(
     libraryDependencies ++= Seq(
       ws
@@ -43,6 +44,8 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
     specs2 % Test,
     "org.scalatest" %% "scalatest" % "2.2.6" % Test
   ),
+  sources in (Compile,doc) := Seq.empty,
+  publishArtifact in (Compile, packageDoc) := false,
   scalacOptions += "-feature",
   coverageHighlighting := true,
   resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases",
