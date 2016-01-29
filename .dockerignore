@@ -1,8 +1,9 @@
 target/
 logs/
+generated/target/
 api/target/
 api/logs/
-project/target
+project/target/
 .git
 .ivy2
 *.swp
