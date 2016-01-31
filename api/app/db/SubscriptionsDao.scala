@@ -94,8 +94,6 @@ object SubscriptionsDao {
       case Nil => {
         val id = idGenerator.randomId
 
-        println(s"id: " +id)
-
         DB.withConnection { implicit c =>
           SQL(InsertQuery).on(
             'id -> id,
