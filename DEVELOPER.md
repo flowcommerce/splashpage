@@ -21,6 +21,11 @@ Database
 
     See https://github.com/flowcommerce/splashpage-postgresql
 
+Running in prod
+===============
+
+    docker run -d -p 80:9000 flowcommerce/splashpage:0.1.12 production
+
 Running locally
 ===============
 
