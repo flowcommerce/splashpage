@@ -4,7 +4,7 @@ import io.flow.common.v0.models.User
 import io.flow.splashpage.v0.{Authorization, Client}
 import io.flow.splashpage.v0.errors.{ErrorsResponse, UnitResponse}
 import io.flow.splashpage.v0.models.{Geo, GeoForm, Publication, Subscription, SubscriptionForm}
-import io.flow.play.clients.{MockAuthorizationClient, MockUserTokensClient}
+import io.flow.play.clients.MockUserTokensClient
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success, Try}
@@ -22,7 +22,6 @@ trait MockClient extends db.Helpers {
     val user = MockUserTokensClient.makeUser()
     val token = "abcdefghijklmnopqrstuvwxyz"
     MockUserTokensClient.add(user, token = Some(token))
-    MockAuthorizationClient.grantAll(user.id.toString)
     new Client(
       s"http://localhost:$port",
       Some(Authorization.Basic(token))
