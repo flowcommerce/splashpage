@@ -4,7 +4,6 @@ import io.flow.common.v0.models.User
 import io.flow.splashpage.v0.{Authorization, Client}
 import io.flow.splashpage.v0.errors.{ErrorsResponse, UnitResponse}
 import io.flow.splashpage.v0.models.{Geo, GeoForm, Publication, Subscription, SubscriptionForm}
-import io.flow.play.clients.MockAuthorizationClient
 import java.util.UUID
 import scala.util.{Failure, Success, Try}
 
