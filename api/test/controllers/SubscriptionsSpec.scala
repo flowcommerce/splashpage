@@ -54,36 +54,6 @@ class SubscriptionsSpec extends PlaySpecification with MockClient {
     }.errors.map(_.message) must beEqualTo(Seq("Publication not found"))
   }
 
-  "POST /subscriptions validates longitude" in new WithServer(port=port) {
-    val form = createSubscriptionForm().copy(
-      geo = Some(
-        GeoForm(
-          latitude = Some("42.213"),
-          longitude = None
-        )
-      )
-    )
-
-    expectErrors {
-      anonClient.subscriptions.post(form)
-    }.errors.map(_.message) must beEqualTo(Seq("If specifying latitude, must also specify longitude"))
-  }
-
- "POST /subscriptions validates latitude" in new WithServer(port=port) {
-    val form = createSubscriptionForm().copy(
-      geo = Some(
-        GeoForm(
-          latitude = None,
-          longitude = Some("42.213")
-        )
-      )
-    )
-
-   expectErrors {
-      anonClient.subscriptions.post(form)
-    }.errors.map(_.message) must beEqualTo(Seq("If specifying longitude, must also specify latitude"))
-  }
-
   "POST /subscriptions geo info ignores empty string" in new WithServer(port=port) {
     val form = GeoForm(
       ipAddress = Some("  ")
@@ -96,16 +66,14 @@ class SubscriptionsSpec extends PlaySpecification with MockClient {
   "POST /subscriptions stores geo info" in new WithServer(port=port) {
     val form = GeoForm(
       ipAddress = Some("127.0.0.1"),
-      latitude = Some("42.213"),
-      longitude = Some("12.213")
+      country = Some("usa")
     )
 
     val sub = createSubscription(createSubscriptionForm().copy(geo = Some(form)))
     sub.geo must beEqualTo(
       Geo(
         ipAddress = form.ipAddress,
-        latitude = form.latitude,
-        longitude = form.longitude
+        country = form.country
       )
     )
   }

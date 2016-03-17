@@ -18,17 +18,16 @@ object SubscriptionsDao {
     select subscriptions.id,
            subscriptions.publication,
            subscriptions.email,
-           subscriptions.ip_address as geo_ip_address,
-           subscriptions.latitude as geo_latitude,
-           subscriptions.longitude as geo_longitude
+           subscriptions.country as geo_country,
+           subscriptions.ip_address as geo_ip_address
       from subscriptions
   """)
 
   private[this] val InsertQuery = """
     insert into subscriptions
-    (id, email, publication, ip_address, latitude, longitude, updated_by_user_id)
+    (id, email, publication, country, ip_address, updated_by_user_id)
     values
-    ({id}, {email}, {publication}, {ip_address}, {latitude}, {longitude}, {updated_by_user_id})
+    ({id}, {email}, {publication}, {country}, {ip_address}, {updated_by_user_id})
   """
 
   private[this] val dbHelpers = DbHelpers("subscriptions")
@@ -65,24 +64,7 @@ object SubscriptionsDao {
       }
     }
 
-    val geoErrors = form.geo match {
-      case None => {
-        Nil
-      }
-      case Some(geo) => {
-        (geo.latitude, geo.longitude) match {
-          case (None, None) | (Some(_), Some(_)) => Nil
-          case (Some(_), None) => {
-            Seq("If specifying latitude, must also specify longitude")
-          }
-          case (None, Some(_)) => {
-            Seq("If specifying longitude, must also specify latitude")
-          }
-        }
-      }
-    }
-
-    publicationErrors ++ emailErrors ++ geoErrors
+    publicationErrors ++ emailErrors
   }
 
   private def isValidEmail(email: String): Boolean = {
@@ -99,9 +81,8 @@ object SubscriptionsDao {
             'id -> id,
             'publication -> form.publication.toString,
             'email -> form.email.trim,
+            'country -> form.geo.flatMap(_.country).flatMap(stringToTrimmedOption(_).map(_.toLowerCase)),
             'ip_address -> form.geo.flatMap(_.ipAddress).flatMap(stringToTrimmedOption(_)),
-            'latitude -> form.geo.flatMap(_.latitude).flatMap(stringToTrimmedOption(_)),
-            'longitude -> form.geo.flatMap(_.longitude).flatMap(stringToTrimmedOption(_)),
             'updated_by_user_id -> createdBy.map(_.id).getOrElse(UserClient.AnonymousUser.id)
           ).execute()
         }

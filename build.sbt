@@ -5,25 +5,13 @@ name := "splashpage"
 
 organization := "io.flow"
 
-scalaVersion in ThisBuild := "2.11.7"
+scalaVersion in ThisBuild := "2.11.8"
 
 // required because of issue between scoverage & sbt
 parallelExecution in Test in ThisBuild := true
 
-lazy val generated = project
-  .in(file("generated"))
-  .enablePlugins(PlayScala)
-  .settings(commonSettings: _*)
-  .settings(
-    libraryDependencies ++= Seq(
-      ws
-    )
-  )
-
 lazy val api = project
   .in(file("api"))
-  .dependsOn(generated)
-  .aggregate(generated)
   .enablePlugins(PlayScala)
   .settings(commonSettings: _*)
   .settings(
