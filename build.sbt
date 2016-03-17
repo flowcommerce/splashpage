@@ -5,7 +5,7 @@ name := "splashpage"
 
 organization := "io.flow"
 
-scalaVersion in ThisBuild := "2.11.7"
+scalaVersion in ThisBuild := "2.11.8"
 
 // required because of issue between scoverage & sbt
 parallelExecution in Test in ThisBuild := true
