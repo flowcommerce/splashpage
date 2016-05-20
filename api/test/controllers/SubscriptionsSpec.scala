@@ -66,14 +66,28 @@ class SubscriptionsSpec extends PlaySpecification with MockClient {
   "POST /subscriptions stores geo info" in new WithServer(port=port) {
     val form = GeoForm(
       ipAddress = Some("127.0.0.1"),
-      country = Some("usa")
+      country = Some("us")
     )
 
     val sub = createSubscription(createSubscriptionForm().copy(geo = Some(form)))
     sub.geo must beEqualTo(
       Geo(
         ipAddress = form.ipAddress,
-        country = form.country
+        country = Some("USA")
+      )
+    )
+  }
+
+  "POST /subscriptions ignores invalid countries" in new WithServer(port=port) {
+    val form = GeoForm(
+      country = Some("random country")
+    )
+
+    val sub = createSubscription(createSubscriptionForm().copy(geo = Some(form)))
+    sub.geo must beEqualTo(
+      Geo(
+        ipAddress = None,
+        country = None
       )
     )
   }

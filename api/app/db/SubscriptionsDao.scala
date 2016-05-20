@@ -75,17 +75,13 @@ object SubscriptionsDao {
     validate(form) match {
       case Nil => {
         val id = idGenerator.randomId
-        val countryCode: Option[String] = form.geo.flatMap(_.country).flatMap(stringToTrimmedOption(_).map(_.toLowerCase))
-        val flowCountry: Option[String] = countryCode.map { code =>
-          Countries.find(code).map(_.iso31663).getOrElse(code)
-        }
 
         DB.withConnection { implicit c =>
           SQL(InsertQuery).on(
             'id -> id,
             'publication -> form.publication.toString,
             'email -> form.email.trim,
-            'country -> flowCountry,
+            'country -> form.geo.flatMap(_.country).flatMap(Countries.find(_)).map(_.iso31663),
             'ip_address -> form.geo.flatMap(_.ipAddress).flatMap(stringToTrimmedOption(_)),
             'updated_by_user_id -> createdBy.map(_.id).getOrElse(Constants.AnonymousUser.id)
           ).execute()
