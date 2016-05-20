@@ -1,12 +1,34 @@
 package db
 
-import io.flow.play.clients.{MockUserTokensClient, UserClient}
+import io.flow.common.v0.models.UserReference
+import io.flow.play.util.IdGenerator
 import io.flow.splashpage.v0.models.{Publication, Subscription, SubscriptionForm}
 import java.util.UUID
 
 trait Helpers {
 
-  private val user = MockUserTokensClient.makeUser()
+  lazy val subscriptionsDao = play.api.Play.current.injector.instanceOf[SubscriptionsDao]
+
+  private[this] lazy val user = createUser()
+  val idGenerator = IdGenerator("tst")
+
+  def createTestId(): String = {
+    idGenerator.randomId()
+  }
+
+  def createTestName(): String = {
+    s"Z Test ${createTestId}"
+  }
+
+  def createTestEmail(): String = {
+    createTestId() + "@test.flow.io"
+  }
+
+  def createUser(): UserReference = {
+    UserReference(
+      id = createTestId()
+    )
+  }
 
   def rightOrErrors[T](result: Either[Seq[String], T]): T = {
     result match {
@@ -14,11 +36,11 @@ trait Helpers {
       case Right(obj) => obj
     }
   }
-
+    
   def createSubscription(
     form: SubscriptionForm = createSubscriptionForm()
   ): Subscription = {
-    rightOrErrors(SubscriptionsDao.create(Some(user), form))
+    rightOrErrors(subscriptionsDao.create(Some(user), form))
   }
 
   def createSubscriptionForm(): SubscriptionForm = {

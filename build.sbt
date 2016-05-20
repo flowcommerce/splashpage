@@ -20,8 +20,9 @@ lazy val api = project
     routesGenerator := InjectedRoutesGenerator,
     libraryDependencies ++= Seq(
       jdbc,
-      "io.flow" %% "lib-play" % "0.0.51",
-      "io.flow" %% "lib-postgresql" % "0.0.30",
+      "io.flow" %% "lib-play" % "0.1.20",
+      "io.flow" %% "lib-postgresql" % "0.0.32",
+      "io.flow" %% "lib-reference" % "0.0.53",
       "org.postgresql" % "postgresql" % "9.4.1208"
     )
   )
@@ -45,4 +46,3 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
     System.getenv("ARTIFACTORY_PASSWORD")
   )
 )
-version := "0.1.24"
