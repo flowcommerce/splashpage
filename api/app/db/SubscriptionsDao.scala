@@ -1,10 +1,10 @@
 package db
 
-import io.flow.common.v0.models.User
+import io.flow.common.v0.models.UserReference
 import io.flow.splashpage.v0.models.{Geo, Publication, Subscription, SubscriptionForm}
 import io.flow.postgresql.{Query, OrderBy}
-import io.flow.play.clients.UserClient
-import io.flow.play.util.IdGenerator
+import io.flow.play.util.{Constants, IdGenerator}
+import io.flow.reference.Countries
 import anorm._
 import play.api.db._
 import play.api.Play.current
@@ -71,19 +71,23 @@ object SubscriptionsDao {
     email.indexOf("@") >= 0
   }
 
-  def create(createdBy: Option[User], form: SubscriptionForm): Either[Seq[String], Subscription] = {
+  def create(createdBy: Option[UserReference], form: SubscriptionForm): Either[Seq[String], Subscription] = {
     validate(form) match {
       case Nil => {
         val id = idGenerator.randomId
+        val countryCode: Option[String] = form.geo.flatMap(_.country).flatMap(stringToTrimmedOption(_).map(_.toLowerCase))
+        val flowCountry: Option[String] = countryCode.map { code =>
+          Countries.find(code).map(_.iso31663).getOrElse(code)
+        }
 
         DB.withConnection { implicit c =>
           SQL(InsertQuery).on(
             'id -> id,
             'publication -> form.publication.toString,
             'email -> form.email.trim,
-            'country -> form.geo.flatMap(_.country).flatMap(stringToTrimmedOption(_).map(_.toLowerCase)),
+            'country -> flowCountry,
             'ip_address -> form.geo.flatMap(_.ipAddress).flatMap(stringToTrimmedOption(_)),
-            'updated_by_user_id -> createdBy.map(_.id).getOrElse(UserClient.AnonymousUser.id)
+            'updated_by_user_id -> createdBy.map(_.id).getOrElse(Constants.AnonymousUser.id)
           ).execute()
         }
   
@@ -99,7 +103,7 @@ object SubscriptionsDao {
     }
   }
 
-  def softDelete(deletedBy: User, subscription: Subscription) {
+  def softDelete(deletedBy: UserReference, subscription: Subscription) {
     dbHelpers.delete(deletedBy, subscription.id)
   }
 
