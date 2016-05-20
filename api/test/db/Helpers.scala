@@ -7,6 +7,8 @@ import java.util.UUID
 
 trait Helpers {
 
+  lazy val subscriptionsDao = play.api.Play.current.injector.instanceOf[SubscriptionsDao]
+
   private[this] lazy val user = createUser()
   val idGenerator = IdGenerator("tst")
 
@@ -38,7 +40,7 @@ trait Helpers {
   def createSubscription(
     form: SubscriptionForm = createSubscriptionForm()
   ): Subscription = {
-    rightOrErrors(SubscriptionsDao.create(Some(user), form))
+    rightOrErrors(subscriptionsDao.create(Some(user), form))
   }
 
   def createSubscriptionForm(): SubscriptionForm = {

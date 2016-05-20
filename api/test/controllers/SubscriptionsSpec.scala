@@ -41,7 +41,7 @@ class SubscriptionsSpec extends PlaySpecification with MockClient {
     anonClient.subscriptions.post(form.copy(email = " " + form.email.toUpperCase + " "))
     anonClient.subscriptions.post(form.copy(email = form.email.toLowerCase))
 
-    db.SubscriptionsDao.findById(sub.id).getOrElse {
+    subscriptionsDao.findById(sub.id).getOrElse {
       sys.error("Failed to create subscription")
     }.email must beEqualTo(form.email)
   }

@@ -10,10 +10,10 @@ import io.flow.common.v0.models.json._
 import play.api.mvc._
 import play.api.libs.json._
 
-class Subscriptions @javax.inject.Inject() () extends Controller with FlowControllerHelpers {
-
-  private[this] val baseContext = "io.flow.authorization.authorizations"
-  private[this] val singleContext = "io.flow.authorization.authorizations.one"
+@javax.inject.Singleton
+class Subscriptions @javax.inject.Inject() (
+  subscriptionsDao: SubscriptionsDao
+) extends Controller with FlowControllerHelpers {
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -34,7 +34,7 @@ class Subscriptions @javax.inject.Inject() () extends Controller with FlowContro
       case Right(orderBy) => {
         Ok(
           Json.toJson(
-            SubscriptionsDao.findAll(
+            subscriptionsDao.findAll(
               ids = optionals(id),
               email = email,
               publication = publication,
@@ -51,7 +51,7 @@ class Subscriptions @javax.inject.Inject() () extends Controller with FlowContro
   def getById(id: String) = Action { request =>
     sys.error("not yet available pending authorization")
 
-    SubscriptionsDao.findById(id) match {
+    subscriptionsDao.findById(id) match {
       case None => {
         NotFound
       }
@@ -69,7 +69,7 @@ class Subscriptions @javax.inject.Inject() () extends Controller with FlowContro
         }
         case s: JsSuccess[SubscriptionForm] => {
           val form = s.get
-          SubscriptionsDao.findAll(
+          subscriptionsDao.findAll(
             publication = Some(form.publication),
             email = Some(form.email)
           ).headOption match {
@@ -77,7 +77,7 @@ class Subscriptions @javax.inject.Inject() () extends Controller with FlowContro
               Ok(Json.toJson(subscription))
             }
             case None => {
-              SubscriptionsDao.create(createdBy = None, form = form) match {
+              subscriptionsDao.create(createdBy = None, form = form) match {
                 case Left(errors) => {
                   UnprocessableEntity(Json.toJson(Validation.errors(errors)))
                 }

@@ -10,9 +10,8 @@ import play.api.db._
 import play.api.Play.current
 import play.api.libs.json._
 
-object SubscriptionsDao {
-
-  private[this] val idGenerator = IdGenerator("sub")
+@javax.inject.Singleton
+class SubscriptionsDao @javax.inject.Inject() () {
 
   private[this] val BaseQuery = Query(s"""
     select subscriptions.id,
@@ -30,6 +29,7 @@ object SubscriptionsDao {
     ({id}, {email}, {publication}, {country}, {ip_address}, {updated_by_user_id})
   """
 
+  private[this] val idGenerator = IdGenerator("sub")
   private[this] val dbHelpers = DbHelpers("subscriptions")
 
   private def stringToTrimmedOption(value: String): Option[String] = {
@@ -54,7 +54,7 @@ object SubscriptionsDao {
       Seq("Please enter a valid email address")
 
     } else {
-      SubscriptionsDao.findAll(
+      findAll(
         email = Some(form.email),
         publication = Some(form.publication),
         limit = 1
