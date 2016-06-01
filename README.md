@@ -3,5 +3,4 @@
 splashpage
 ==========
 
-Backend api for splashpage
-
+Backend api for www.flow.io supporting subscription requests to announcements from Flow.
