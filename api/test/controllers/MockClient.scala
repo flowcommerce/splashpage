@@ -1,15 +1,14 @@
 package controllers
 
-import io.flow.common.v0.models.UserReference
-import io.flow.play.clients.MockTokenClient
 import io.flow.splashpage.v0.{Authorization, Client}
 import io.flow.splashpage.v0.errors.{ErrorsResponse, UnitResponse}
-import io.flow.splashpage.v0.models.{Geo, GeoForm, Publication, Subscription, SubscriptionForm}
 import io.flow.token.v0.models.Token
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success, Try}
 import java.util.concurrent.TimeUnit
+import io.flow.play.clients.MockTokenClient
+import org.joda.time.DateTime
 
 trait MockClient extends db.Helpers {
 
@@ -17,14 +16,14 @@ trait MockClient extends db.Helpers {
 
   val port = 9010
 
-  lazy val mockTokenClient = play.api.Play.current.injector.instanceOf[MockTokenClient]
+  lazy val mockClient = play.api.Play.current.injector.instanceOf[MockTokenClient]
 
   lazy val anonClient = new Client(s"http://localhost:$port")
 
   lazy val identifiedClient = {
     val user = createUser()
     val token = "abcdefghijklmnopqrstuvwxyz"
-    mockTokenClient.data.add(token, Token(user = user))
+    mockClient.data.add(token, Token(id = createTestId(), user = user, createdAt = new DateTime))
     new Client(
       s"http://localhost:$port",
       Some(Authorization.Basic(token))
