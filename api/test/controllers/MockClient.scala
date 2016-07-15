@@ -17,7 +17,7 @@ trait MockClient extends db.Helpers {
 
   val port = 9010
 
-  val mockClient = play.api.Play.current.injector.instanceOf[TokenClient].asInstanceOf[MockTokenClient]
+  lazy val mockClient = play.api.Play.current.injector.instanceOf[TokenClient].asInstanceOf[MockTokenClient]
 
   lazy val anonClient = new Client(s"http://localhost:$port")
 
