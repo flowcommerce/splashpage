@@ -9,6 +9,7 @@ import scala.util.{Failure, Success, Try}
 import java.util.concurrent.TimeUnit
 import io.flow.play.clients.MockTokenClient
 import org.joda.time.DateTime
+import io.flow.token.v0.interfaces.{Client => TokenClient}
 
 trait MockClient extends db.Helpers {
 
@@ -16,14 +17,14 @@ trait MockClient extends db.Helpers {
 
   val port = 9010
 
-  lazy val mockClient = play.api.Play.current.injector.instanceOf[MockTokenClient]
+  val mockClient = play.api.Play.current.injector.instanceOf[TokenClient].asInstanceOf[MockTokenClient]
 
   lazy val anonClient = new Client(s"http://localhost:$port")
 
   lazy val identifiedClient = {
     val user = createUser()
     val token = "abcdefghijklmnopqrstuvwxyz"
-    mockClient.data.add(token, Token(id = createTestId(), user = user, createdAt = new DateTime))
+    mockClient.data.add(token, Token(id = token, user = user, partial = "tok-test", createdAt = new DateTime))
     new Client(
       s"http://localhost:$port",
       Some(Authorization.Basic(token))
