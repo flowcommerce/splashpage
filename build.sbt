@@ -1,14 +1,10 @@
 import play.PlayImport.PlayKeys._
-import scoverage.ScoverageSbtPlugin.ScoverageKeys._
 
 name := "splashpage"
 
 organization := "io.flow"
 
 scalaVersion in ThisBuild := "2.11.8"
-
-// required because of issue between scoverage & sbt
-parallelExecution in Test in ThisBuild := true
 
 lazy val api = project
   .in(file("api"))
@@ -20,7 +16,7 @@ lazy val api = project
     routesGenerator := InjectedRoutesGenerator,
     libraryDependencies ++= Seq(
       jdbc,
-      "io.flow" %% "lib-play" % "0.1.37",
+      "io.flow" %% "lib-play" % "0.1.41",
       "io.flow" %% "lib-postgresql" % "0.0.32",
       "io.flow" %% "lib-reference" % "0.0.91",
       "org.postgresql" % "postgresql" % "9.4.1209"
@@ -36,7 +32,6 @@ lazy val commonSettings: Seq[Setting[_]] = Seq(
   sources in (Compile,doc) := Seq.empty,
   publishArtifact in (Compile, packageDoc) := false,
   scalacOptions += "-feature",
-  coverageHighlighting := true,
   resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases",
   resolvers += "Artifactory" at "https://flow.artifactoryonline.com/flow/libs-release/",
   credentials += Credentials(

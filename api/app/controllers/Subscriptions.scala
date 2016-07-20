@@ -9,6 +9,7 @@ import io.flow.postgresql.OrderBy
 import io.flow.common.v0.models.json._
 import play.api.mvc._
 import play.api.libs.json._
+import scala.concurrent.Future
 
 @javax.inject.Singleton
 class Subscriptions @javax.inject.Inject() (
@@ -61,31 +62,33 @@ class Subscriptions @javax.inject.Inject() (
     }
   }
 
-  def post() = Action { request =>
-    JsValue.sync(request.contentType, request.body) { js =>
-      js.validate[SubscriptionForm] match {
-        case e: JsError => {
-          UnprocessableEntity(Json.toJson(Validation.invalidJson(e)))
-        }
-        case s: JsSuccess[SubscriptionForm] => {
-          val form = s.get
-          subscriptionsDao.findAll(
-            publication = Some(form.publication),
-            email = Some(form.email)
-          ).headOption match {
-            case Some(subscription) => {
-              Ok(Json.toJson(subscription))
-            }
-            case None => {
-              subscriptionsDao.create(createdBy = None, form = form) match {
-                case Left(errors) => {
-                  UnprocessableEntity(Json.toJson(Validation.errors(errors)))
-                }
-                case Right(subscription) => {
-                  Created(Json.toJson(subscription))
+  def post() = Action.async { request =>
+    Future {
+      JsValue.sync(request.contentType, request.body) { js =>
+        js.validate[SubscriptionForm] match {
+          case e: JsError => {
+            UnprocessableEntity(Json.toJson(Validation.invalidJson(e)))
+          }
+          case s: JsSuccess[SubscriptionForm] => {
+            val form = s.get
+            subscriptionsDao.findAll(
+              publication = Some(form.publication),
+              email = Some(form.email)
+            ).headOption match {
+              case Some(subscription) => {
+                Ok(Json.toJson(subscription))
+              }
+              case None => {
+                subscriptionsDao.create(createdBy = None, form = form) match {
+                  case Left(errors) => {
+                    UnprocessableEntity(Json.toJson(Validation.errors(errors)))
+                  }
+                  case Right(subscription) => {
+                    Created(Json.toJson(subscription))
+                  }
                 }
               }
-          }
+            }
           }
         }
       }
