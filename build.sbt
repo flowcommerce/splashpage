@@ -18,7 +18,7 @@ lazy val api = project
       jdbc,
       "io.flow" %% "lib-play" % "0.1.47",
       "io.flow" %% "lib-postgresql" % "0.0.34",
-      "io.flow" %% "lib-reference" % "0.2.10",
+      "io.flow" %% "lib-reference" % "0.2.18",
       "org.postgresql" % "postgresql" % "9.4.1209"
     )
   )
