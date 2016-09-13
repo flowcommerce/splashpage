@@ -19,15 +19,15 @@ lazy val api = project
       "io.flow" %% "lib-play" % "0.1.62",
       "io.flow" %% "lib-postgresql-play" % "0.0.2",
       "io.flow" %% "lib-reference" % "0.2.38",
-      "org.postgresql" % "postgresql" % "9.4.1210"
+      "org.postgresql" % "postgresql" % "9.4.1210",
+      "org.scalatestplus" %% "play" % "1.4.0" % "test"
     )
   )
 
 lazy val commonSettings: Seq[Setting[_]] = Seq(
   name <<= name("splashpage-" + _),
   libraryDependencies ++= Seq(
-    specs2 % Test,
-    "org.scalatest" %% "scalatest" % "2.2.6" % Test
+    specs2 % Test
   ),
   sources in (Compile,doc) := Seq.empty,
   publishArtifact in (Compile, packageDoc) := false,
