@@ -89,7 +89,7 @@
           "responses": {
             "200": { "type": "subscription", "description": "Indicates that request was successful, but email address was already subscribed. We return the original subscription record" },
             "201": { "type": "subscription" },
-            "422": { "type": "io.flow.error.v0.models.validation_error" }
+            "422": { "type": "io.flow.error.v0.models.generic_error" }
           }
         },
 
