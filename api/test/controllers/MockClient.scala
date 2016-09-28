@@ -1,7 +1,7 @@
 package controllers
 
 import io.flow.splashpage.v0.{Authorization, Client}
-import io.flow.splashpage.v0.errors.{ErrorsResponse, UnitResponse}
+import io.flow.splashpage.v0.errors.{ValidationErrorResponse, UnitResponse}
 import io.flow.token.v0.models.Token
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
@@ -34,7 +34,7 @@ trait MockClient extends db.Helpers {
   def expectErrors[T](
     f: => Future[T],
     duration: Duration = DefaultDuration
-  ): ErrorsResponse = {
+  ): ValidationErrorResponse = {
     Try(
       Await.result(f, duration)
     ) match {
@@ -42,11 +42,11 @@ trait MockClient extends db.Helpers {
         sys.error("Expected function to fail but it succeeded with: " + response)
       }
       case Failure(ex) =>  ex match {
-        case e: ErrorsResponse => {
+        case e: ValidationErrorResponse => {
           e
         }
         case e => {
-          sys.error(s"Expected an exception of type[ErrorsResponse] but got[$e]")
+          sys.error(s"Expected an exception of type[ValidationErrorResponse] but got[$e]")
         }
       }
     }

@@ -6,7 +6,7 @@ import io.flow.splashpage.v0.models.json._
 import io.flow.play.controllers.FlowControllerHelpers
 import io.flow.play.util.Validation
 import io.flow.postgresql.OrderBy
-import io.flow.common.v0.models.json._
+import io.flow.error.v0.models.json._
 import play.api.mvc._
 import play.api.libs.json._
 import scala.concurrent.Future
@@ -30,7 +30,7 @@ class Subscriptions @javax.inject.Inject() (
 
     OrderBy.parse(sort, Some("subscriptions")) match {
       case Left(errors) => {
-        UnprocessableEntity(Json.toJson(Validation.invalidSort(errors)))
+        UnprocessableEntity(Json.toJson(Validation.errors(errors)))
       }
       case Right(orderBy) => {
         Ok(

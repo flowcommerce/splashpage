@@ -2,7 +2,7 @@ package controllers
 
 import io.flow.common.v0.models.User
 import io.flow.splashpage.v0.{Authorization, Client}
-import io.flow.splashpage.v0.errors.{ErrorsResponse, UnitResponse}
+import io.flow.splashpage.v0.errors.{ValidationErrorResponse, UnitResponse}
 import io.flow.splashpage.v0.models.{Geo, GeoForm, Publication, Subscription, SubscriptionForm}
 import java.util.UUID
 import scala.util.{Failure, Success, Try}
@@ -24,13 +24,13 @@ class SubscriptionsSpec extends PlaySpecification with MockClient {
   "POST /subscriptions validates empty email" in new WithServer(port=port) {
     expectErrors {
       anonClient.subscriptions.post(createSubscriptionForm().copy(email = "  "))
-    }.errors.map(_.message) must beEqualTo(Seq("Email address cannot be empty"))
+    }.validationError.messages must beEqualTo(Seq("Email address cannot be empty"))
   }
 
   "POST /subscriptions validates invalid email" in new WithServer(port=port) {
     expectErrors {
       anonClient.subscriptions.post(createSubscriptionForm().copy(email = "test"))
-    }.errors.map(_.message) must beEqualTo(Seq("Please enter a valid email address"))
+    }.validationError.messages must beEqualTo(Seq("Please enter a valid email address"))
   }
 
   "POST /subscriptions is idempotent with duplicate email" in new WithServer(port=port) {
@@ -51,7 +51,7 @@ class SubscriptionsSpec extends PlaySpecification with MockClient {
 
     expectErrors {
       anonClient.subscriptions.post(form.copy(publication = Publication.UNDEFINED("invalid_publication")))
-    }.errors.map(_.message) must beEqualTo(Seq("Publication not found"))
+    }.validationError.messages must beEqualTo(Seq("Publication not found"))
   }
 
   "POST /subscriptions geo info ignores empty string" in new WithServer(port=port) {
