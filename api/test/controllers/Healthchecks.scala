@@ -1,7 +1,7 @@
 package controllers
 
-import io.flow.common.v0.Client
-import io.flow.common.v0.models.Healthcheck
+import io.flow.healthcheck.v0.Client
+import io.flow.healthcheck.v0.models.Healthcheck
 
 import play.api.libs.ws._
 import play.api.test._
@@ -17,7 +17,7 @@ class HealthchecksSpec extends PlaySpecification {
     await(
       client.healthchecks.getHealthcheck()
     ) must beEqualTo(
-      io.flow.common.v0.models.Healthcheck("healthy")
+      io.flow.healthcheck.v0.models.Healthcheck("healthy")
     )
   }
 

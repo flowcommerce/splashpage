@@ -3,7 +3,7 @@
   "base_url": "https://api.flow.io",
 
   "imports": [
-    { "uri": "http://www.apidoc.me/flow/common/0.0.11/service.json" }
+    { "uri": "http://www.apidoc.me/flow/error/latest/service.json" }
   ],
 
   "enums": {
@@ -89,7 +89,7 @@
           "responses": {
             "200": { "type": "subscription", "description": "Indicates that request was successful, but email address was already subscribed. We return the original subscription record" },
             "201": { "type": "subscription" },
-            "422": { "type": "[io.flow.common.v0.models.error]" }
+            "422": { "type": "io.flow.error.v0.models.validation_error" }
           }
         },
 

@@ -1,4 +1,4 @@
--> / common.Routes
+-> / healthcheck.Routes
 -> / splashpage.Routes
 
 
