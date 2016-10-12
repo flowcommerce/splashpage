@@ -17,7 +17,7 @@ lazy val api = project
     libraryDependencies ++= Seq(
       jdbc,
       "io.flow" %% "lib-postgresql-play" % "0.0.15",
-      "io.flow" %% "lib-reference" % "0.2.51",
+      "io.flow" %% "lib-reference" % "0.2.55",
       "org.postgresql" % "postgresql" % "9.4.1211",
       "org.scalatestplus" %% "play" % "1.4.0" % "test"
     )
