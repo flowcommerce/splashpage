@@ -1,15 +1,13 @@
 package controllers
 
+import io.flow.common.v0.models.UserReference
+import io.flow.play.util.{AuthData, AuthHeaders}
 import io.flow.splashpage.v0.{Authorization, Client}
 import io.flow.splashpage.v0.errors.{GenericErrorResponse, UnitResponse}
-import io.flow.token.v0.models.Token
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success, Try}
 import java.util.concurrent.TimeUnit
-import io.flow.play.clients.MockTokenClient
-import org.joda.time.DateTime
-import io.flow.token.v0.interfaces.{Client => TokenClient}
 
 trait MockClient extends db.Helpers {
 
@@ -17,17 +15,13 @@ trait MockClient extends db.Helpers {
 
   val port = 9010
 
-  lazy val mockClient = play.api.Play.current.injector.instanceOf[TokenClient].asInstanceOf[MockTokenClient]
-
   lazy val anonClient = new Client(s"http://localhost:$port")
+  lazy val authHeaders = play.api.Play.current.injector.instanceOf[AuthHeaders]
 
-  lazy val identifiedClient = {
-    val user = createUser()
-    val token = "abcdefghijklmnopqrstuvwxyz"
-    mockClient.data.add(token, Token(id = token, user = user, partial = "tok-test", createdAt = new DateTime))
+  def identifiedClient(user: UserReference = createUser()): Client = {
     new Client(
       s"http://localhost:$port",
-      Some(Authorization.Basic(token))
+      defaultHeaders = authHeaders.headers(AuthData.user(user))
     )
   }
   
