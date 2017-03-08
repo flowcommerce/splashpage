@@ -1,7 +1,7 @@
 package controllers
 
 import io.flow.common.v0.models.UserReference
-import io.flow.play.util.{AuthData, AuthHeaders}
+import io.flow.play.util.AuthHeaders
 import io.flow.splashpage.v0.{Authorization, Client}
 import io.flow.splashpage.v0.errors.{GenericErrorResponse, UnitResponse}
 import scala.concurrent.{Await, Future}
@@ -21,7 +21,7 @@ trait MockClient extends db.Helpers {
   def identifiedClient(user: UserReference = createUser()): Client = {
     new Client(
       s"http://localhost:$port",
-      defaultHeaders = authHeaders.headers(AuthData.user(user))
+      defaultHeaders = authHeaders.headers(AuthHeaders.user(user))
     )
   }
   
