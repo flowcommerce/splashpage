@@ -24,7 +24,7 @@ lazy val api = project
   )
 
 lazy val commonSettings: Seq[Setting[_]] = Seq(
-  name <<= name("splashpage-" + _),
+  name ~= ("splashpage-" + _),
   libraryDependencies ++= Seq(
     specs2 % Test
   ),
